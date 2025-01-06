@@ -51,9 +51,7 @@ class Grid:
         neighbors = {}
         for direction, (dx, dy, dz) in self.directions.items():
             neighbor_coords = (x + dx, y + dy, z + dz)
-            neighbor = self.get_node(*neighbor_coords)
-            if neighbor is not None:
-                neighbors[direction] = neighbor
+            neighbors[direction] = self.get_node(*neighbor_coords)
         return neighbors
 
     def display_grid(self):

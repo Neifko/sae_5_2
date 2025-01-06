@@ -11,7 +11,7 @@ class Node:
         self.y = y              
         self.z = z              
         self.voisins = {}           # Dictionnaire des voisins
-        self.valeur = None          # Valeur ou propriété du nœud (facultatif)
+        self.valeur = 1             # Valeur ou propriété du nœud (facultatif)
         self.active = True          # Indicateur pour dire si le noeud est un obstacle ou non (si False, il s'agit d'un obstacle)
 
     def __repr__(self):
