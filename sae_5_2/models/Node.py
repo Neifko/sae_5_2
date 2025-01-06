@@ -8,7 +8,7 @@ class Node:
         self.y = y  # Coordonnée y (cubique)
         self.z = z  # Coordonnée z (cubique)
         self.voisins = {}  # Dictionnaire des voisins
-        self.valeur = None  # Valeur ou propriété du nœud (facultatif)
+        self.valeur = 1  # Valeur ou propriété du nœud (facultatif)
 
     def __repr__(self):
         return f"HexNode(x={self.x}, y={self.y}, z={self.z}, valeur={self.valeur})"
