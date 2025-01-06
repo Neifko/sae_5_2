@@ -1,12 +1,11 @@
 from sae_5_2.models.Node import Node
 
-
 class Grid:
     """
     Classe représentant une grille contenant des noeuds hexagonaux.
     La grille est générée en utilisant des coordonnées cubiques (pour les déplacements qui seront fait par les algorithmes).
     """
-    def __init__(self, rows:int, cols:int):
+    def __init__(self, rows: int, cols: int):
         """
         Constructeur de la classe Grid qui prend en paramètre le nombre de lignes et de colonnes.
         """
@@ -25,7 +24,7 @@ class Grid:
 
     def _create_grid(self):
         """
-        Méthode qui permet d'ajouter les noeuds de la grille en les créants et en les connectants entre eux.
+        Méthode qui permet d'ajouter les noeuds de la grille en les créant et en les connectant entre eux.
         """
         for x in range(self.cols):
             for y in range(self.rows):
@@ -39,36 +38,38 @@ class Grid:
                 if neighbor_coords in self.nodes:
                     node.voisins[direction] = self.nodes[neighbor_coords]
 
-    def display_grid(self):
+    def get_node(self, x, y, z):
         """
-        Affiche la grille en ligne de commande avec les coordonnées cubiques de chaque nœud.  
-        """
-        for y in range(self.rows):
-            line = ""
-            for x in range(self.cols):
-                # Décalage des lignes impaires pour afficher les hexagones correctement
-                if y % 2 == 0:
-                    line += f" ({x},{y},{-x-y}) "
-                else:
-                    line += f"   ({x},{y},{-x-y}) "
-            print(line)
-
-    def display_neighbors(self, x:int, y:int, z:int):
-        """
-        Affiche les voisins d'un nœud en précisant ses coordonées (x, y, z).
-        """
-        node = self.get_node(x, y, z)
-        if not node:
-            print(f"Pas de nœud trouvé aux coordonnées ({x}, {y}, {z}).")
-            return
-
-        print(f"\nNœud ({x}, {y}, {z}): {node}")
-        print("Voisins :")
-        for direction, neighbor in node.voisins.items():
-            print(f"  Direction {direction}: {neighbor}")
-
-    def get_node(self, x:int, y:int, z:int):
-        """
-        Retourne le nœud aux coordonnées (x, y, z).
+        Retourne le noeud aux coordonnées spécifiées.
         """
         return self.nodes.get((x, y, z))
+
+    def get_neighbors(self, x, y, z):
+        """
+        Retourne les voisins d'un noeud donné dans toutes les directions possibles.
+        """
+        neighbors = {}
+        for direction, (dx, dy, dz) in self.directions.items():
+            neighbor_coords = (x + dx, y + dy, z + dz)
+            neighbor = self.get_node(*neighbor_coords)
+            if neighbor is not None:
+                neighbors[direction] = neighbor
+        return neighbors
+
+    def display_grid(self):
+        """
+        Affiche la grille en ligne de commande avec les coordonnées cubiques de chaque nœud.
+        """
+        print("Grille des noeuds (coordonnées x, y, z) :")
+        for y in range(self.rows):
+            for x in range(self.cols):
+                z = -x - y
+                node = self.get_node(x, y, z)
+                if node:
+                    print(f"({node.x}, {node.y}, {node.z})", end=" ")
+                else:
+                    print("(None)", end=" ")
+            print()  # Nouvelle ligne pour chaque rangée
+
+    def __repr__(self):
+        return f"Grid(rows={self.rows}, cols={self.cols}, nodes={self.nodes})"
