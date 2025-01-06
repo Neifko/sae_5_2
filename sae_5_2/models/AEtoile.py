@@ -1,30 +1,32 @@
+from sae_5_2.models.Grid import Grid
 from sae_5_2.models.Node import Node
 
+
 class AEtoile:
-    def __init__(self, grid):
+    def __init__(self, grid:Grid):
         """
         Constructeur de la classe AEtoile qui prend en paramètre une grille de noeuds.
         """
         self.grid = grid
 
-    def heuristic(self, node1, node2):
+    def heuristic(self, node1:Node, node2:Node) -> int:
         """
         Fonction heuristique pour estimer la distance entre deux noeuds.
         Utilise la distance de Manhattan pour les coordonnées cubiques.
         """
         return max(abs(node1.x - node2.x), abs(node1.y - node2.y), abs(node1.z - node2.z))
 
-    def a_star(self, start_coords, goal_coords):
+    def a_star(self, start_coords:tuple, goal_coords:tuple):
         """
         Algorithme A* pour trouver le chemin le plus court entre deux noeuds.
         """
         start_node = self.grid.get_node(*start_coords)
         goal_node = self.grid.get_node(*goal_coords)
 
-        open_set = [start_node]
-        came_from = {}
-        g_score = {start_node: 0}
-        f_score = {start_node: self.heuristic(start_node, goal_node)}
+        open_set = [start_node]                 # Liste des noeuds à évaluer, initialisée avec le noeud de départ
+        came_from = {}                          # Dictionnaire pour garder la trace du chemin
+        g_score = {start_node: 0}               # Coût du chemin le plus court depuis le départ jusqu'à ce noeud
+        f_score = {start_node: self.heuristic(start_node, goal_node)}  # Estimation du coût total du départ à l'objectif en passant par ce noeud
 
         while open_set:
             # Trouver le noeud dans open_set avec le plus petit f_score
@@ -41,6 +43,11 @@ class AEtoile:
 
                 tentative_g_score = g_score[current] + neighbor.valeur
 
+                """
+                Logique pour évaluer le voisin et mettre à jour les valeurs si nécessaire.
+                Si le voisin n'a pas encore été évalué ou si le nouveau chemin est meilleur que l'ancien,
+                alors on met à jour les valeurs et on l'ajoute à la liste des noeuds à évaluer (s'il n'y est pas encore).
+                """
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score
@@ -50,7 +57,7 @@ class AEtoile:
 
         return None
 
-    def reconstruct_path(self, came_from, current):
+    def reconstruct_path(self, came_from:dict, current:Node) -> list:
         """
         Reconstruit le chemin à partir du dictionnaire came_from.
         """
