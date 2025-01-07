@@ -21,16 +21,21 @@ class GUI:
         self.entry_frame = ctk.CTkFrame(self.color_buttons_frame)
         self.entry_frame.pack(side=ctk.BOTTOM, padx=10, pady=10, fill=ctk.X)
 
+        # Slider pour gérer la taille des hexagones
+        self.size_slider = ctk.CTkSlider(self.entry_frame, from_=10, to=50, number_of_steps=5, orientation=ctk.HORIZONTAL, command=self.controller.update_hex_size)
+        self.size_slider.pack(side=ctk.TOP, padx=2, pady=2)
+        self.size_slider.set(30)  # Valeur par défaut
+
         # Switch pour afficher les coordonnées
         self.show_coords_label = ctk.CTkLabel(self.entry_frame, text="Afficher les coordonnées:")
-        self.show_coords_label.pack(side=ctk.TOP, padx=5, pady=5)
-        self.show_coords_switch = ctk.CTkSwitch(self.entry_frame, command=self.controller.draw_grid)
-        self.show_coords_switch.pack(side=ctk.TOP, padx=5, pady=5)
+        self.show_coords_label.pack(side=ctk.TOP, padx=2, pady=2)
+        self.show_coords_switch = ctk.CTkSwitch(self.entry_frame, command=self.controller.toggle_coords)
+        self.show_coords_switch.pack(side=ctk.TOP, padx=2, pady=2)
 
         # Étiquette et zone de saisie pour les lignes
         self.rows_label = ctk.CTkLabel(self.entry_frame, text="Nombre de lignes:")
         self.rows_label.pack(side=ctk.TOP, padx=5, pady=5)
-        self.rows_entry = ctk.CTkEntry(self.entry_frame)
+        self.rows_entry = ctk.CTkEntry(self.entry_frame, )
         self.rows_entry.pack(side=ctk.TOP, padx=5, pady=5)
         self.rows_entry.insert(0, "10")  # Valeur par défaut
 
@@ -43,7 +48,11 @@ class GUI:
 
         # Bouton pour dessiner la grille
         self.draw_button = ctk.CTkButton(self.entry_frame, text="Dessiner la grille", command=self.controller.draw_grid)
-        self.draw_button.pack(side=ctk.TOP, padx=5, pady=5)
+        self.draw_button.pack(side=ctk.TOP, padx=2, pady=2)
+
+        # Bouton pour dessiner le maximum de hexagones possibles en fonction de l'écran et de la taille des hexagones
+        self.max_button = ctk.CTkButton(self.entry_frame, text="Grille complète", command=self.controller.draw_max_grid)
+        self.max_button.pack(side=ctk.TOP, padx=5, pady=5)
 
         # Cadre principal pour les boutons et la zone de dessin
         self.main_frame = ctk.CTkFrame(self.root)
@@ -65,7 +74,7 @@ class GUI:
         # Forcer la mise à jour de la taille du canvas
         self.hex_canvas.update_idletasks()
 
-    def draw_hexagon(self, x, y, size, color, label=None):
+    def draw_hexagon(self, x, y, size, color, label=None, font_size=12):
         points = []
         for i in range(6):
             angle = math.radians(60 * i)
@@ -76,7 +85,7 @@ class GUI:
         self.hex_canvas.create_polygon(points, outline="black", fill=color, width=1)
 
         if label:
-            self.hex_canvas.create_text(x, y, text=label, fill="black")
+            self.hex_canvas.create_text(x, y, text=label, fill="black", font=("Arial", font_size))
 
     def clear_canvas(self):
         self.hex_canvas.delete("all")
