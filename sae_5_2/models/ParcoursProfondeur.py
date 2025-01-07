@@ -1,9 +1,19 @@
 class ParcoursProfondeur:
     def __init__(self, hex_grid):
+        """
+        Initialiser le parcours en profondeur sur une grille hexagonale.
+        :param hex_grid: Grille hexagonale
+        """
         self.grid = hex_grid
         self.visited = set()  # Ensemble pour suivre les nœuds visités
 
     def parcours(self, start_coords, target_coords):
+        """
+        Parcours en profondeur
+        :param start_coords: Coordonnées de départ (x, y, z)
+        :param target_coords: Coordonnées d'arrivée (x, y, z)
+        :return: Chemin entre les deux points
+        """
         stack = [start_coords]
         path = []
         self.visited = set()
