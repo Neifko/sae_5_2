@@ -1,30 +1,49 @@
-# Exemple d'utilisation
-from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
 from sae_5_2.models.Grid import Grid
 
+import random
+
+def main():
+    # Crée une grille de dimensions 5x5
+    width = 10
+    height = 5
+    grid = Grid(width, height)
+
+    # Affiche la grille sous forme de matrice
+    grid.display_grid()
+
+    # Désactive certains noeuds de manière aléatoire
+    num_nodes_to_deactivate = 7
+    deactivated_nodes = []
+    for _ in range(num_nodes_to_deactivate):
+        while True:
+            x = random.randint(0, width - 1)
+            y = random.randint(0, height - 1)
+            z = -x - y
+            node = grid.get_node(x, y, z)
+            if node and node.active:
+                node.active = False
+                deactivated_nodes.append(node)
+                break
+
+    # Affiche les noeuds désactivés
+    print("\nNoeuds désactivés (coordonnées x, y, z) :")
+    for node in deactivated_nodes:
+        print(f"({node.x}, {node.y}, {node.z})")
+
+
+    # Teste l'algorithme Bellman-Ford pour trouver le chemin le plus court
+    start = (0, 0, 0)
+    goal = (2, 5, -7)
+
+    print("\nDépart :", start)
+    print("Arrivée :", goal)
+
+    # if path:
+    #     print("\nChemin trouvé :")
+    #     for node in path:
+    #         print(f"({node.x}, {node.y}, {node.z})")
+    # else:
+    #     print("\nAucun chemin trouvé.")
+
 if __name__ == "__main__":
-    # Exemple d'utilisation
-    rows, cols = 3, 3  # Taille de la grille
-    hex_grid = Grid(rows, cols)
-
-    # Afficher la grille hexagonale avec les coordonnées dans la console
-    hex_grid.display_grid()
-
-    # Afficher les voisins d'un nœud particulier
-    hex_grid.display_neighbors(0, 1, -1)  # Coordonnées (x=2, y=2, z=-4)
-
-    # # Création d'une grille hexagonale de 4x4
-    # hex_grid = HexGrid(4, 4)
-    #
-    # # Création de l'instance DFS
-    # hex_dfs = HexDFS(hex_grid)
-    #
-    # # Exemple de parcours DFS pour vérifier s'il existe un chemin entre deux nœuds
-    # start_coords = (2, 2, -4)  # Nœud de départ
-    # target_coords = (1, 3, -4)  # Nœud cible
-    #
-    # # Vérifier si un chemin existe entre les deux nœuds
-    # path_exists = hex_dfs.dfs(start_coords, target_coords)
-    #
-    # # Afficher le résultat
-    # print(f"Un chemin existe entre {start_coords} et {target_coords}: {path_exists}")
+    main()
