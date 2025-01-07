@@ -9,7 +9,7 @@ class Node:
         self.z = z  
 
         self.voisins = {}       # Dictionnaire des voisins
-        self.valeur = None      # Valeur ou propriété du nœud (facultatif)
+        self.valeur = 1         # Valeur ou propriété du nœud (facultatif)
         self.active = True
 
     def __repr__(self):
