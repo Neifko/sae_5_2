@@ -45,7 +45,7 @@ class InterfaceController:
         # Obtenir les coordonnées centrales de la zone de dessin
         canvas_center_x, canvas_center_y = self.view.get_canvas_center()
 
-        # Déterminer les positions des nœuds en fonction des voisins
+        # Calculer les positions des hexagones en fonction de l'hexagone (0, 0, 0)
         positions = {}
         for (x, y, z), node in self.grid.nodes.items():
             if (x, y, z) not in positions:
@@ -62,12 +62,18 @@ class InterfaceController:
                     positions[(x, y, z)][1] + dy
                 )
 
+        # Ajuster les positions pour centrer l'hexagone (0, 0, 0)
+        center_offset_x, center_offset_y = positions[(0, 0, 0)]
+        for key in positions:
+            positions[key] = (
+                positions[key][0] - center_offset_x + canvas_center_x,
+                positions[key][1] - center_offset_y + canvas_center_y
+            )
+
         # Dessiner les hexagones
         for (x, y, z), (px, py) in positions.items():
-            canvas_x = px + canvas_center_x
-            canvas_y = py + canvas_center_y
             coord = f"({x},{y},{z})"
-            self.view.draw_hexagon(canvas_x, canvas_y, size, "white", coord if self.view.show_coords_switch.get() else None)
+            self.view.draw_hexagon(px, py, size, "white", coord if self.view.show_coords_switch.get() else None)
 
     def get_direction_offset(self, direction, size):
         if direction == "N":
