@@ -21,13 +21,15 @@ class Grid:
         self._create_grid()
 
     def _create_grid(self):
-        """Crée la grille avec des nœuds hexagonaux"""
-        for x in range(self.cols):
-            for y in range(self.rows):
-                z = -x - y  # Calcul de z pour respecter x + y + z = 0
-                self.nodes[(x, y, z)] = Node(x, y, z)
+        center_x = self.cols // 2
+        center_y = self.rows // 2
 
-        # Connecter les voisins pour chaque nœud
+        for x in range(-center_x, center_x + 1):
+            for y in range(-center_y, center_y + 1):
+                z = -x - y
+                if -center_x <= x <= center_x and -center_y <= y <= center_y:
+                    self.nodes[(x, y, z)] = Node(x, y, z)
+
         for (x, y, z), node in self.nodes.items():
             for direction, (dx, dy, dz) in self.directions.items():
                 neighbor_coords = (x + dx, y + dy, z + dz)
@@ -35,15 +37,15 @@ class Grid:
                     node.voisins[direction] = self.nodes[neighbor_coords]
 
     def display_grid(self):
-        """Affiche graphiquement la grille hexagonale avec les coordonnées"""
-        for y in range(self.rows):
+        for y in range(-self.rows // 2, self.rows // 2 + 1):
             line = ""
-            for x in range(self.cols):
-                # Décalage des lignes impaires pour afficher les hexagones correctement
-                if y % 2 == 0:
-                    line += f" ({x},{y},{-x-y}) "
-                else:
-                    line += f"   ({x},{y},{-x-y}) "
+            for x in range(-self.cols // 2, self.cols // 2 + 1):
+                z = -x - y
+                if (x, y, z) in self.nodes:
+                    if y % 2 == 0:
+                        line += f" ({x},{y},{z}) "
+                    else:
+                        line += f"   ({x},{y},{z}) "
             print(line)
 
     def display_neighbors(self, x, y, z):
