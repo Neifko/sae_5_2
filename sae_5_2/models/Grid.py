@@ -1,4 +1,4 @@
-from models.Node import Node
+from sae_5_2.models.Node import Node
 
 class Grid:
     """
@@ -23,15 +23,24 @@ class Grid:
         self._create_grid()
 
     def _create_grid(self):
-        center_x = self.cols // 2
-        center_y = self.rows // 2
+        """
+        Génère une grille hexagonale avec une disposition en nid d'abeilles
+        et une origine au centre de la grille.
+        """
+        center_row = self.rows // 2
+        center_col = self.cols // 2
 
-        for x in range(-center_x, center_x + 1):
-            for y in range(-center_y, center_y + 1):
-                z = -x - y
-                if -center_x <= x <= center_x and -center_y <= y <= center_y:
-                    self.nodes[(x, y, z)] = Node(x, y, z)
+        for row in range(-center_row, center_row + 1):
+            for col in range(-center_col, center_col + 1):
+                # Décalage horizontal pour les colonnes en fonction des lignes
+                x = col - (row // 2)
+                z = row
+                y = -x - z
 
+                # Création du nœud
+                self.nodes[(x, y, z)] = Node(x, y, z)
+
+        # Connexions des voisins
         for (x, y, z), node in self.nodes.items():
             for direction, (dx, dy, dz) in self.directions.items():
                 neighbor_coords = (x + dx, y + dy, z + dz)
