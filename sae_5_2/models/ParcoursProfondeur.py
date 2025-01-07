@@ -3,32 +3,25 @@ class ParcoursProfondeur:
         self.grid = hex_grid
         self.visited = set()  # Ensemble pour suivre les nœuds visités
 
-    def dfs_recursive(self, current, target, current_distance, path):
-        """Effectuer un parcours en profondeur récursif (DFS) entre start et target."""
-        # Si le nœud courant est déjà visité, on retourne
-        if current in self.visited:
-            return False, float('inf'), []
+    def parcours(self, start_coords, target_coords):
+        stack = [start_coords]
+        path = []
+        self.visited = set()
 
-        # Marquer le nœud comme visité
-        self.visited.add(current)
+        while stack:
+            current_coords = stack.pop()
+            if current_coords in self.visited:
+                continue
 
-        # Ajouter la position actuelle au chemin et la distance
-        path.append(current)
-        current_node = self.grid.get_node(*current)
-        current_distance += current_node.valeur
+            self.visited.add(current_coords)
+            path.append(current_coords)
 
-        # Si on a trouvé le nœud cible
-        if current == target:
-            return True, current_distance, path
+            if current_coords == target_coords:
+                return path
 
-        # Explorer récursivement les voisins
-        for direction, neighbor in current_node.voisins.items():
-            neighbor_coords = (neighbor.x, neighbor.y, neighbor.z)
-            found, total_distance, full_path = self.dfs_recursive(
-                neighbor_coords, target, current_distance, path.copy()
-            )
+            current_node = self.grid.get_node(*current_coords)
+            for neighbor in current_node.voisins.values():
+                if neighbor and (neighbor.x, neighbor.y, neighbor.z) not in self.visited:
+                    stack.append((neighbor.x, neighbor.y, neighbor.z))
 
-            if found:
-                return True, total_distance, full_path
-
-        return False, float('inf'), []  # Aucun chemin trouvé
+        return None  # Retourne None si aucun chemin n'est trouvé
