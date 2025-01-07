@@ -2,9 +2,9 @@ import math
 from models.Grid import Grid
 
 class InterfaceController:
-    def __init__(self):
+    def __init__(self, rows, cols):
         self.view = None
-        self.grid = None
+        self.grid = Grid(rows, cols)
         self.hex_size = 30  # Taille initiale des hexagones
 
     def set_view(self, view):
@@ -14,9 +14,7 @@ class InterfaceController:
         self.view.clear_canvas()
         rows = int(self.view.rows_entry.get())
         cols = int(self.view.cols_entry.get())
-        self.grid = Grid(rows, cols)
-        self.grid.display_grid()
-        self.grid.display_neighbors(0, 1, -1)
+        
         self.draw_hex_grid(rows, cols, self.hex_size)
 
     def draw_max_grid(self):
@@ -34,13 +32,10 @@ class InterfaceController:
         self.view.cols_entry.delete(0, 'end')
         self.view.cols_entry.insert(0, str(cols))
 
-        self.grid = Grid(rows, cols)
-        self.grid.display_grid()
-        self.grid.display_neighbors(0, 1, -1)
         self.draw_hex_grid(rows, cols, self.hex_size)
 
     def draw_hex_grid(self, rows, cols, size):
-        font_size = max(8, int(size * 0.4))  
+        font_size = max(8, int(size * 0.4))
         font = ("Arial", font_size)
         for row in range(rows):
             for col in range(cols):

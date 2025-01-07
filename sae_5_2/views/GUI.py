@@ -2,7 +2,7 @@ import customtkinter as ctk
 import math
 
 class GUI:
-    def __init__(self, root, controller):
+    def __init__(self, root, controller, rows, cols):
         self.controller = controller
         self.root = root
         self.root.title("Hexagones")
@@ -35,16 +35,16 @@ class GUI:
         # Étiquette et zone de saisie pour les lignes
         self.rows_label = ctk.CTkLabel(self.entry_frame, text="Nombre de lignes:")
         self.rows_label.pack(side=ctk.TOP, padx=5, pady=5)
-        self.rows_entry = ctk.CTkEntry(self.entry_frame, )
+        self.rows_entry = ctk.CTkEntry(self.entry_frame)
         self.rows_entry.pack(side=ctk.TOP, padx=5, pady=5)
-        self.rows_entry.insert(0, "10")  # Valeur par défaut
+        self.rows_entry.insert(0, str(rows))  # Valeur par défaut
 
         # Étiquette et zone de saisie pour les colonnes
         self.cols_label = ctk.CTkLabel(self.entry_frame, text="Nombre de colonnes:")
         self.cols_label.pack(side=ctk.TOP, padx=5, pady=5)
         self.cols_entry = ctk.CTkEntry(self.entry_frame)
         self.cols_entry.pack(side=ctk.TOP, padx=5, pady=5)
-        self.cols_entry.insert(0, "10")  # Valeur par défaut
+        self.cols_entry.insert(0, str(cols))  # Valeur par défaut
 
         # Bouton pour dessiner la grille
         self.draw_button = ctk.CTkButton(self.entry_frame, text="Dessiner la grille", command=self.controller.draw_grid)
