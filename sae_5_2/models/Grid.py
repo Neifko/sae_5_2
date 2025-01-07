@@ -32,7 +32,6 @@ class Grid:
                 if -center_x <= x <= center_x and -center_y <= y <= center_y:
                     self.nodes[(x, y, z)] = Node(x, y, z)
 
-        # Connecter les voisins pour chaque nœud
         for (x, y, z), node in self.nodes.items():
             for direction, (dx, dy, dz) in self.directions.items():
                 neighbor_coords = (x + dx, y + dy, z + dz)
