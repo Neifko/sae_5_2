@@ -14,7 +14,9 @@ class InterfaceController:
         self.view.clear_canvas()
         rows = int(self.view.rows_entry.get())
         cols = int(self.view.cols_entry.get())
-        
+
+        # Recréer la grille avec les nouvelles dimensions
+        self.grid = Grid(rows, cols)
         self.draw_hex_grid(rows, cols, self.hex_size)
 
     def draw_max_grid(self):
@@ -32,17 +34,56 @@ class InterfaceController:
         self.view.cols_entry.delete(0, 'end')
         self.view.cols_entry.insert(0, str(cols))
 
+        # Recréer la grille avec les nouvelles dimensions
+        self.grid = Grid(rows, cols)
         self.draw_hex_grid(rows, cols, self.hex_size)
 
     def draw_hex_grid(self, rows, cols, size):
         font_size = max(8, int(size * 0.4))
         font = ("Arial", font_size)
-        for row in range(rows):
-            for col in range(cols):
-                x = 1.5 * size * col + size
-                y = math.sqrt(3) * size * (row + 0.5 * (col % 2)) + size
-                coord = f"({col},{row},{-col-row})"
-                self.view.draw_hexagon(x, y, size, "white", coord if self.view.show_coords_switch.get() else None)
+
+        # Obtenir les coordonnées centrales de la zone de dessin
+        canvas_center_x, canvas_center_y = self.view.get_canvas_center()
+
+        # Déterminer les positions des nœuds en fonction des voisins
+        positions = {}
+        for (x, y, z), node in self.grid.nodes.items():
+            if (x, y, z) not in positions:
+                positions[(x, y, z)] = (0, 0)  # Position initiale
+
+            for direction, neighbor in node.voisins.items():
+                nx, ny, nz = neighbor.x, neighbor.y, neighbor.z
+                if (nx, ny, nz) not in positions:
+                    positions[(nx, ny, nz)] = (0, 0)  # Position initiale
+
+                dx, dy = self.get_direction_offset(direction, size)
+                positions[(nx, ny, nz)] = (
+                    positions[(x, y, z)][0] + dx,
+                    positions[(x, y, z)][1] + dy
+                )
+
+        # Dessiner les hexagones
+        for (x, y, z), (px, py) in positions.items():
+            canvas_x = px + canvas_center_x
+            canvas_y = py + canvas_center_y
+            coord = f"({x},{y},{z})"
+            self.view.draw_hexagon(canvas_x, canvas_y, size, "white", coord if self.view.show_coords_switch.get() else None)
+
+    def get_direction_offset(self, direction, size):
+        if direction == "N":
+            return (0, -math.sqrt(3) * size)
+        elif direction == "NE":
+            return (1.5 * size, -math.sqrt(3) / 2 * size)
+        elif direction == "SE":
+            return (1.5 * size, math.sqrt(3) / 2 * size)
+        elif direction == "S":
+            return (0, math.sqrt(3) * size)
+        elif direction == "SW":
+            return (-1.5 * size, math.sqrt(3) / 2 * size)
+        elif direction == "NW":
+            return (-1.5 * size, -math.sqrt(3) / 2 * size)
+        else:
+            return (0, 0)
 
     def toggle_coords(self):
         if self.grid:

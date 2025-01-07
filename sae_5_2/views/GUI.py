@@ -74,6 +74,11 @@ class GUI:
         # Forcer la mise à jour de la taille du canvas
         self.hex_canvas.update_idletasks()
 
+    def get_canvas_center(self):
+        canvas_width = self.hex_canvas.winfo_width()
+        canvas_height = self.hex_canvas.winfo_height()
+        return canvas_width / 2, canvas_height / 2
+
     def draw_hexagon(self, x, y, size, color, label=None, font_size=12):
         points = []
         for i in range(6):
