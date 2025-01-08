@@ -1,16 +1,17 @@
 import customtkinter as ctk
 import math
 from tkinter import Canvas
-from views.Depart_Objectif_Buttons import ButtonHandlers
 from models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
-class GUI(ButtonHandlers):
+class GUI:
     def __init__(self, root, controller, rows, cols):
-        super().__init__()
         self.controller = controller
         self.root = root
         self.root.title("Hexagones")
         self.root.geometry("1000x600")
+
+        # Variable pour suivre la couleur actuelle
+        self.current_color = ""  # Couleur transparente par défaut
 
         # Création des boutons de couleur
         self.color_buttons_frame = ctk.CTkFrame(self.root)
@@ -23,7 +24,7 @@ class GUI(ButtonHandlers):
             elif color == "Objectif":
                 button = ctk.CTkButton(self.color_buttons_frame, text=color, command=self.set_objectif)
             else:
-                button = ctk.CTkButton(self.color_buttons_frame, text=color, command=lambda c=color: print(c))
+                button = ctk.CTkButton(self.color_buttons_frame, text=color, command=lambda c=color: self.set_color(c))
             button.pack(fill=ctk.X, padx=5, pady=2)
 
         # Cadre pour les zones de saisie et le switch
@@ -73,11 +74,14 @@ class GUI(ButtonHandlers):
 
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur", "Bellman-Ford", "Dijkstra", "A*"]
         for action in actions:
-            button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
+            if action == "Effacer Tout":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
+            else:
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
 
         # Zone de dessin des hexagones
-        self.hex_canvas = Canvas(self.main_frame, bg="black")
+        self.hex_canvas = Canvas(self.main_frame, bg="grey")
         self.hex_canvas.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
 
         # Forcer la mise à jour de la taille du canvas
@@ -93,9 +97,29 @@ class GUI(ButtonHandlers):
 
         # Lier les événements de clic sur le canvas
         self.hex_canvas.bind("<Button-1>", self.on_canvas_click)
+        self.hex_canvas.bind("<B1-Motion>", self.on_canvas_motion)
+        self.hex_canvas.bind("<ButtonRelease-1>", self.on_canvas_release)
 
         # Dictionnaire pour stocker les hexagones dessinés
         self.hexagons = {}
+        # Dictionnaire pour stocker les couleurs précédentes des hexagones
+        self.current_hex_colors = {}
+
+    def set_depart(self):
+        self.depart_mode = True
+        self.objectif_mode = False
+        print("Mode Départ activé")
+
+    def set_objectif(self):
+        self.objectif_mode = True
+        self.depart_mode = False
+        print("Mode Objectif activé")
+
+    def set_color(self, color):
+        self.current_color = color
+        self.depart_mode = False
+        self.objectif_mode = False
+        print(f"Color set to {color}")
 
     def get_canvas_center(self):
         canvas_width = self.hex_canvas.winfo_width()
@@ -119,13 +143,20 @@ class GUI(ButtonHandlers):
         self.hexagons[(x, y)] = hex_id
 
     def clear_canvas(self):
+        self.reset_hexagon_colors()
+
+    def reset_hexagon_colors(self):
+        for (hex_x, hex_y), hex_id in self.hexagons.items():
+            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "white")
+
+    def clear_hexagons(self):
         self.hex_canvas.delete("all")
         self.hexagons.clear()
         self.depart_hex = None
         self.objectif_hex = None
 
     def draw_grid(self):
-        self.clear_canvas()
+        self.clear_hexagons()
         rows = int(self.rows_entry.get())
         cols = int(self.cols_entry.get())
 
@@ -137,7 +168,7 @@ class GUI(ButtonHandlers):
         self.restore_special_hexagons()
 
     def draw_max_grid(self):
-        self.clear_canvas()
+        self.clear_hexagons()
         canvas_width = self.hex_canvas.winfo_width()
         canvas_height = self.hex_canvas.winfo_height()
 
@@ -157,3 +188,71 @@ class GUI(ButtonHandlers):
 
         # Restaurer les cases de départ et d'objectif
         self.restore_special_hexagons()
+
+    def toggle_coords(self):
+        if self.controller.grid:
+            self.clear_hexagons()
+            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
+            # Restaurer les cases de départ et d'objectif
+            self.restore_special_hexagons()
+
+    def update_hex_size(self, size):
+        self.controller.hex_size = int(size)
+        if self.controller.grid:
+            self.clear_hexagons()
+            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
+            # Restaurer les cases de départ et d'objectif
+            self.restore_special_hexagons()
+
+    def restore_special_hexagons(self):
+        if self.depart_hex:
+            hex_x, hex_y = self.depart_hex
+            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "pink")  # Rose pour le départ
+        if self.objectif_hex:
+            hex_x, hex_y = self.objectif_hex
+            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "red")  # Rouge pour l'objectif
+
+    def on_canvas_click(self, event):
+        x, y = event.x, event.y
+        # Vérifier si un hexagone est cliqué
+        for (hex_x, hex_y), hex_id in self.hexagons.items():
+            if self.hex_canvas.find_closest(x, y)[0] == hex_id:
+                if self.depart_mode:
+                    if self.depart_hex:
+                        # Réinitialiser l'ancienne case de départ
+                        old_hex_x, old_hex_y = self.depart_hex
+                        current_color = self.current_hex_colors.get((old_hex_x, old_hex_y), "")
+                        self.draw_hexagon(old_hex_x, old_hex_y, self.controller.hex_size, current_color)
+                    self.depart_hex = (hex_x, hex_y)
+                    self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
+                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "pink")  # Rose pour le départ
+                elif self.objectif_mode:
+                    if self.objectif_hex:
+                        # Réinitialiser l'ancienne case d'objectif
+                        old_hex_x, old_hex_y = self.objectif_hex
+                        current_color = self.current_hex_colors.get((old_hex_x, old_hex_y), "")
+                        self.draw_hexagon(old_hex_x, old_hex_y, self.controller.hex_size, current_color)
+                    self.objectif_hex = (hex_x, hex_y)
+                    self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
+                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "red")  # Rouge pour l'objectif
+                else:
+                    if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
+                        continue  # Ne pas changer la couleur de la case départ ou objectif
+                    self.current_hex_colors[(hex_x, hex_y)] = self.current_color
+                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, self.current_color)
+                break
+
+    def on_canvas_motion(self, event):
+        if not self.depart_mode and not self.objectif_mode:
+            x, y = event.x, event.y
+            # Vérifier si un hexagone est cliqué
+            for (hex_x, hex_y), hex_id in self.hexagons.items():
+                if self.hex_canvas.find_closest(x, y)[0] == hex_id:
+                    if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
+                        continue  # Ne pas changer la couleur de la case départ ou objectif
+                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, self.current_color)
+                    break
+
+    def on_canvas_release(self, event):
+        self.depart_mode = False
+        self.objectif_mode = False

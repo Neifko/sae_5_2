@@ -42,9 +42,6 @@ class InterfaceController:
         font_size = max(8, int(size * 0.4))
         font = ("Arial", font_size)
 
-        # Obtenir les coordonnées centrales de la zone de dessin
-        canvas_center_x, canvas_center_y = self.view.get_canvas_center()
-
         # Calculer les positions des hexagones en fonction de l'hexagone (0, 0, 0)
         positions = {}
         for (x, y, z), node in self.grid.nodes.items():
@@ -62,12 +59,13 @@ class InterfaceController:
                     positions[(x, y, z)][1] + dy
                 )
 
-        # Ajuster les positions pour centrer l'hexagone (0, 0, 0)
-        center_offset_x, center_offset_y = positions[(0, 0, 0)]
+        # Ajuster les positions pour commencer en haut à gauche
+        start_offset_x = size  # Décalage initial pour éviter de dessiner en dehors du canvas
+        start_offset_y = size
         for key in positions:
             positions[key] = (
-                positions[key][0] - center_offset_x + canvas_center_x,
-                positions[key][1] - center_offset_y + canvas_center_y
+                positions[key][0] + start_offset_x,
+                positions[key][1] + start_offset_y
             )
 
         # Dessiner les hexagones
@@ -93,11 +91,14 @@ class InterfaceController:
 
     def toggle_coords(self):
         if self.grid:
-            self.view.clear_canvas()
+            self.view.clear_hexagons()
             self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
 
     def update_hex_size(self, size):
         self.hex_size = int(size)
         if self.grid:
-            self.view.clear_canvas()
+            self.view.clear_hexagons()
             self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
+
+    def clear_grid(self):
+        self.grid = Grid(0, 0)  # Réinitialiser la grille
