@@ -28,3 +28,6 @@ class ProfondeurController:
             print(f"Chemin trouvé : {path}")
         else:
             print(f"Aucun chemin trouvé entre {start_coords} et {target_coords}.")
+
+    def execute(self):
+        pass

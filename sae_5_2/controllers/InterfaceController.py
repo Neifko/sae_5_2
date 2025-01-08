@@ -70,8 +70,7 @@ class InterfaceController:
 
         # Dessiner les hexagones
         for (x, y, z), (px, py) in positions.items():
-            coord = f"({x},{y},{z})"
-            self.view.draw_hexagon(px, py, size, "white", coord if self.view.show_coords_switch.get() else None)
+            self.view.draw_hexagon(px, py, size, "white", (x, y, z))
 
     def get_direction_offset(self, direction, size):
         if direction == "N":

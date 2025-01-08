@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import math
 from tkinter import Canvas
+from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
 class GUI:
@@ -9,6 +10,8 @@ class GUI:
         self.root = root
         self.root.title("Hexagones")
         self.root.geometry("1000x600")
+
+        self.profondeur_controller = ProfondeurController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = ""  # Couleur transparente par défaut
@@ -76,6 +79,8 @@ class GUI:
         for action in actions:
             if action == "Effacer Tout":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
+            elif action == "Parcours en profondeur":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_profondeur)
             else:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
@@ -104,6 +109,73 @@ class GUI:
         self.hexagons = {}
         # Dictionnaire pour stocker les couleurs précédentes des hexagones
         self.current_hex_colors = {}
+        self.cubique_hexgones = {}
+
+    def pixel_to_hexagon_coords(self, x, y):
+        """
+        Convertit les coordonnées pixels (x, y) en coordonnées cubiques (x, y, z)
+        pour une grille d'hexagones plats (flat-topped).
+        """
+        size = self.controller.hex_size  # Taille des hexagones
+        center_x, center_y = self.get_canvas_center()  # Centre du canvas
+
+        # Décalage des coordonnées pixels pour centrer sur la grille
+        dx = x - center_x
+        dy = y - center_y
+
+        # Conversion en coordonnées axiales (q, r) pour hexagones plats
+        q = (2 / 3) * dx / size
+        r = (-1 / 3 * dx + math.sqrt(3) / 3 * dy) / size
+
+        # Conversion des coordonnées axiales en cubiques
+        cube_coords = self.axial_to_cube(q, r)
+
+        # Arrondi des coordonnées cubiques pour trouver l'hexagone le plus proche
+        rounded_coords = self.cube_round(cube_coords)
+        return rounded_coords
+
+
+
+    def axial_to_cube(self, q, r):
+        x = q
+        z = r
+        y = -x - z
+        return (x, y, z)
+    
+    def cube_round(self, cube_coords):
+        """
+        Arrondit les coordonnées cubiques pour trouver l'hexagone le plus proche.
+        """
+        x, y, z = cube_coords
+        rx = round(x)
+        ry = round(y)
+        rz = round(z)
+
+        x_diff = abs(rx - x)
+        y_diff = abs(ry - y)
+        z_diff = abs(rz - z)
+
+        # Ajustement pour respecter x + y + z = 0
+        if x_diff > y_diff and x_diff > z_diff:
+            rx = -ry - rz
+        elif y_diff > z_diff:
+            ry = -rx - rz
+        else:
+            rz = -rx - ry
+
+        return (rx, ry, rz)
+
+    def call_profondeur(self):
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        print(f"Coordonnées cubiques de départ: {self.depart_cube}")
+        print(f"Coordonnées cubiques d'objectif: {self.objectif_cube}")
+
+        # self.profondeur_controller.execute(self.depart_hex, self.objectif_hex)
+
+
 
     def set_depart(self):
         self.depart_mode = True
@@ -126,8 +198,10 @@ class GUI:
         canvas_height = self.hex_canvas.winfo_height()
         return canvas_width / 2, canvas_height / 2
 
-    def draw_hexagon(self, x, y, size, color, label=None, font_size=12):
+    def draw_hexagon(self, x, y, size, color, coord=None, font_size=12):
         points = []
+        coord_str = f"({coord[0]},{coord[1]},{coord[2]})"
+        label = coord_str if self.show_coords_switch.get() else None
         for i in range(6):
             angle = math.radians(60 * i)
             px = x + size * math.cos(angle)
@@ -141,6 +215,7 @@ class GUI:
 
         # Stocker l'hexagone dessiné avec ses coordonnées
         self.hexagons[(x, y)] = hex_id
+        self.cubique_hexgones[coord] = hex_id
 
     def clear_canvas(self):
         self.reset_hexagon_colors()
@@ -226,6 +301,7 @@ class GUI:
                     self.depart_hex = (hex_x, hex_y)
                     self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
                     self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "pink")  # Rose pour le départ
+                    self.depart_cube = self.axial_to_cube(hex_x, hex_y)  # Stocker les coordonnées cubiques
                 elif self.objectif_mode:
                     if self.objectif_hex:
                         # Réinitialiser l'ancienne case d'objectif
@@ -235,6 +311,7 @@ class GUI:
                     self.objectif_hex = (hex_x, hex_y)
                     self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
                     self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "red")  # Rouge pour l'objectif
+                    self.objectif_cube = self.axial_to_cube(hex_x, hex_y)  # Stocker les coordonnées cubiques
                 else:
                     if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
                         continue  # Ne pas changer la couleur de la case départ ou objectif
