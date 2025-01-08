@@ -5,33 +5,47 @@ class Grid:
     Classe représentant une grille contenant des noeuds hexagonaux.
     La grille est générée en utilisant des coordonnées cubiques (pour les déplacements qui seront fait par les algorithmes).
     """
-    def __init__(self, rows: int, cols: int):
+
+    def __init__(self, rows, cols):
         """
         Constructeur de la classe Grid qui prend en paramètre le nombre de lignes et de colonnes.
         """
         self.rows = rows  
         self.cols = cols  
-        self.nodes = {}           # Dictionnaire pour stocker les nœuds
+        self.nodes = {}    # Dictionnaire pour stocker les nœuds
         self.directions = {
-            "N": (+1, -1, 0),     # Nord
-            "NE": (+1, 0, -1),    # Nord-Est
-            "SE": (0, +1, -1),    # Sud-Est
-            "S": (-1, +1, 0),     # Sud
-            "SW": (-1, 0, +1),    # Sud-Ouest
-            "NW": (0, -1, +1)     # Nord-Ouest
+            "N": (0, -1, +1),  # Nord
+            "NE": (+1, -1, 0),  # Nord-Est
+            "SE": (+1, 0, -1),  # Sud-Est
+            "S": (0, +1, -1),  # Sud
+            "SW": (-1, +1, 0),  # Sud-Ouest
+            "NW": (-1, 0, +1)  # Nord-Ouest
         }
         self._create_grid()
 
     def _create_grid(self):
         """
         Méthode qui permet d'ajouter les noeuds de la grille en les créant et en les connectant entre eux.
+        Place l'origine (0, 0, 0) en bas à gauche.
         """
-        for x in range(self.cols):
-            for y in range(self.rows):
-                z = -x - y  # Calcul de z pour respecter x + y + z = 0
+        offset = 0
+        for col in range(self.cols):
+
+            for row in range(self.rows):
+                # Adjust horizontal offset for columns based on rows
+                x = col
+                y = row - offset
+                z = -x - y
+
+                # Create the node
                 self.nodes[(x, y, z)] = Node(x, y, z)
 
-        # Connecter les voisins pour chaque nœud
+            if col % 2 == 1:
+                offset += 1
+
+
+
+        # Connect neighbors
         for (x, y, z), node in self.nodes.items():
             for direction, (dx, dy, dz) in self.directions.items():
                 neighbor_coords = (x + dx, y + dy, z + dz)
@@ -59,15 +73,28 @@ class Grid:
         Affiche la grille en ligne de commande avec les coordonnées cubiques de chaque nœud.
         """
         print("Grille des noeuds (coordonnées x, y, z) :")
-        for y in range(self.rows):
-            for x in range(self.cols):
+        for y in range(-self.rows // 2, self.rows // 2 + 1):
+            line = ""
+            for x in range(-self.cols // 2, self.cols // 2 + 1):
                 z = -x - y
-                node = self.get_node(x, y, z)
-                if node:
-                    print(f"({node.x}, {node.y}, {node.z})", end=" ")
-                else:
-                    print("(None)", end=" ")
-            print()  # Nouvelle ligne pour chaque rangée
+                if (x, y, z) in self.nodes:
+                    if y % 2 == 0:
+                        line += f" ({x},{y},{z}) "
+                    else:
+                        line += f"   ({x},{y},{z}) "
+            print(line)
+
+    def display_neighbors(self, x, y, z):
+        """Affiche les voisins d'un nœud spécifique avec leurs directions cardinales"""
+        node = self.get_node(x, y, z)
+        if not node:
+            print(f"Pas de nœud trouvé aux coordonnées ({x}, {y}, {z}).")
+            return
+
+        print(f"\nNœud ({x}, {y}, {z}): {node}")
+        print("Voisins :")
+        for direction, neighbor in node.voisins.items():
+            print(f"  Direction {direction}: {neighbor}")
 
     def __repr__(self):
         return f"Grid(rows={self.rows}, cols={self.cols}, nodes={self.nodes})"
