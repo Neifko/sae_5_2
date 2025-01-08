@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import math
 from tkinter import Canvas
-from models.Grid import Grid  # Assurez-vous que cette importation est correcte
+from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
 class GUI:
     def __init__(self, root, controller, rows, cols):
