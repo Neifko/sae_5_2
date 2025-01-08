@@ -13,10 +13,10 @@ class ProfondeurController:
 
         # Définir le point de départ et d'arrivée
         start_coords = (0, 0, 0)
-        target_coords = (2, 2, -4)
+        target_coords = (2,1,-3)
 
-        hex_grid.display_neighbors(*start_coords)
-        hex_grid.display_neighbors(*target_coords)
+        # hex_grid.display_neighbors(*start_coords)
+        # hex_grid.display_neighbors(*target_coords)
 
         # Lancer DFS récursif
         path = parcours_profondeur.parcours(start_coords, target_coords)
