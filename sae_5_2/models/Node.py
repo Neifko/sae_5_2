@@ -3,6 +3,7 @@ class Node:
     Classe représentant un nœud hexagonal dans un graphe.
     Chaque nœud a 6 voisins.
     """
+    
     def __init__(self, x:int, y:int, z:int):
         """
         Constructeur de la classe Node qui prend en paramètre les coordonnées cubique du noeud.

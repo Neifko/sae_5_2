@@ -1,12 +1,13 @@
+import random
+import customtkinter as ctk
+
 from sae_5_2.models.Grid import Grid
 from sae_5_2.models.AEtoile import AEtoile
 from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
 from sae_5_2.models.Node import Node
 from sae_5_2.views.GUI import GUI
-import customtkinter as ctk
 from sae_5_2.controllers.InterfaceController import InterfaceController
 
-import random
 
 def main():
     # Crée une grille de dimensions 5x5
@@ -31,7 +32,7 @@ def main():
                 deactivated_nodes.append(node)
                 break
 
-    # Affiche les noeuds désactivés
+                # Affiche les noeuds désactivés
     print("\nNoeuds désactivés (coordonnées x, y, z) :")
     for node in deactivated_nodes:
         print(f"({node.x}, {node.y}, {node.z})")
@@ -69,4 +70,3 @@ if __name__ == "__main__":
     controller.set_view(gui)
     root.mainloop()
     # ---------------------------------------------------------------------
-
