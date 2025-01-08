@@ -4,6 +4,7 @@ from tkinter import Canvas
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
+
 class GUI:
     def __init__(self, root, controller, rows, cols):
         self.controller = controller
@@ -35,7 +36,8 @@ class GUI:
         self.entry_frame.pack(side=ctk.BOTTOM, padx=10, pady=10, fill=ctk.X)
 
         # Slider pour gérer la taille des hexagones
-        self.size_slider = ctk.CTkSlider(self.entry_frame, from_=10, to=50, number_of_steps=5, orientation=ctk.HORIZONTAL, command=self.update_hex_size)
+        self.size_slider = ctk.CTkSlider(self.entry_frame, from_=10, to=50, number_of_steps=5,
+                                         orientation=ctk.HORIZONTAL, command=self.update_hex_size)
         self.size_slider.pack(side=ctk.TOP, padx=2, pady=2)
         self.size_slider.set(30)  # Valeur par défaut
 
@@ -75,7 +77,8 @@ class GUI:
         self.action_buttons_frame = ctk.CTkFrame(self.main_frame)
         self.action_buttons_frame.pack(side=ctk.TOP, fill=ctk.X, padx=10, pady=5)
 
-        actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur", "Bellman-Ford", "Dijkstra", "A*"]
+        actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur",
+                   "Bellman-Ford", "Dijkstra", "A*"]
         for action in actions:
             if action == "Effacer Tout":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
@@ -109,73 +112,34 @@ class GUI:
         self.hexagons = {}
         # Dictionnaire pour stocker les couleurs précédentes des hexagones
         self.current_hex_colors = {}
-        self.cubique_hexgones = {}
-
-    def pixel_to_hexagon_coords(self, x, y):
-        """
-        Convertit les coordonnées pixels (x, y) en coordonnées cubiques (x, y, z)
-        pour une grille d'hexagones plats (flat-topped).
-        """
-        size = self.controller.hex_size  # Taille des hexagones
-        center_x, center_y = self.get_canvas_center()  # Centre du canvas
-
-        # Décalage des coordonnées pixels pour centrer sur la grille
-        dx = x - center_x
-        dy = y - center_y
-
-        # Conversion en coordonnées axiales (q, r) pour hexagones plats
-        q = (2 / 3) * dx / size
-        r = (-1 / 3 * dx + math.sqrt(3) / 3 * dy) / size
-
-        # Conversion des coordonnées axiales en cubiques
-        cube_coords = self.axial_to_cube(q, r)
-
-        # Arrondi des coordonnées cubiques pour trouver l'hexagone le plus proche
-        rounded_coords = self.cube_round(cube_coords)
-        return rounded_coords
-
-
+        self.hex_id_get_coords = {}
 
     def axial_to_cube(self, q, r):
         x = q
         z = r
         y = -x - z
         return (x, y, z)
-    
-    def cube_round(self, cube_coords):
-        """
-        Arrondit les coordonnées cubiques pour trouver l'hexagone le plus proche.
-        """
-        x, y, z = cube_coords
-        rx = round(x)
-        ry = round(y)
-        rz = round(z)
-
-        x_diff = abs(rx - x)
-        y_diff = abs(ry - y)
-        z_diff = abs(rz - z)
-
-        # Ajustement pour respecter x + y + z = 0
-        if x_diff > y_diff and x_diff > z_diff:
-            rx = -ry - rz
-        elif y_diff > z_diff:
-            ry = -rx - rz
-        else:
-            rz = -rx - ry
-
-        return (rx, ry, rz)
 
     def call_profondeur(self):
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
 
-        print(f"Coordonnées cubiques de départ: {self.depart_cube}")
-        print(f"Coordonnées cubiques d'objectif: {self.objectif_cube}")
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(self.hex_id_get_coords)
+
+        print(f"Coordonnées axiales de départ: {self.depart_hex}")
+        print(f"Coordonnées axiales d'objectif: {self.objectif_hex}")
+
+        print(f"hex id depart : {self.hexagons[self.depart_hex]}")
+        print(f"hex id objectif : {self.hexagons[self.objectif_hex]}")
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
 
         # self.profondeur_controller.execute(self.depart_hex, self.objectif_hex)
-
-
 
     def set_depart(self):
         self.depart_mode = True
@@ -200,8 +164,7 @@ class GUI:
 
     def draw_hexagon(self, x, y, size, color, coord=None, font_size=12):
         points = []
-        coord_str = f"({coord[0]},{coord[1]},{coord[2]})"
-        label = coord_str if self.show_coords_switch.get() else None
+
         for i in range(6):
             angle = math.radians(60 * i)
             px = x + size * math.cos(angle)
@@ -210,23 +173,31 @@ class GUI:
             points.append(py)
         hex_id = self.hex_canvas.create_polygon(points, outline="black", fill=color, width=1)
 
-        if label:
-            self.hex_canvas.create_text(x, y, text=label, fill="black", font=("Arial", font_size))
-
         # Stocker l'hexagone dessiné avec ses coordonnées
         self.hexagons[(x, y)] = hex_id
-        self.cubique_hexgones[coord] = hex_id
+
+        if coord is not None:
+            coord_str = f"({coord[0]},{coord[1]},{coord[2]})"
+            self.hex_id_get_coords[hex_id] = coord
+        else:
+            coord_str = ""
+
+        label = coord_str if self.show_coords_switch.get() else None
+
+        if label:
+            self.hex_canvas.create_text(x, y, text=label, fill="black", font=("Arial", font_size))
 
     def clear_canvas(self):
         self.reset_hexagon_colors()
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
-            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "white")
+            self.hex_canvas.itemconfig(hex_id, fill="white")
 
     def clear_hexagons(self):
         self.hex_canvas.delete("all")
         self.hexagons.clear()
+        self.hex_id_get_coords.clear()
         self.depart_hex = None
         self.objectif_hex = None
 
@@ -267,7 +238,8 @@ class GUI:
     def toggle_coords(self):
         if self.controller.grid:
             self.clear_hexagons()
-            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
+            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols,
+                                          self.controller.hex_size)
             # Restaurer les cases de départ et d'objectif
             self.restore_special_hexagons()
 
@@ -275,17 +247,18 @@ class GUI:
         self.controller.hex_size = int(size)
         if self.controller.grid:
             self.clear_hexagons()
-            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
+            self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols,
+                                          self.controller.hex_size)
             # Restaurer les cases de départ et d'objectif
             self.restore_special_hexagons()
 
     def restore_special_hexagons(self):
         if self.depart_hex:
             hex_x, hex_y = self.depart_hex
-            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "pink")  # Rose pour le départ
+            self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="pink")
         if self.objectif_hex:
             hex_x, hex_y = self.objectif_hex
-            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "red")  # Rouge pour l'objectif
+            self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="red")
 
     def on_canvas_click(self, event):
         x, y = event.x, event.y
@@ -297,26 +270,26 @@ class GUI:
                         # Réinitialiser l'ancienne case de départ
                         old_hex_x, old_hex_y = self.depart_hex
                         current_color = self.current_hex_colors.get((old_hex_x, old_hex_y), "")
-                        self.draw_hexagon(old_hex_x, old_hex_y, self.controller.hex_size, current_color)
+                        self.hex_canvas.itemconfig(self.hexagons[(old_hex_x, old_hex_y)], fill=current_color)
                     self.depart_hex = (hex_x, hex_y)
                     self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
-                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "pink")  # Rose pour le départ
+                    self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="pink")
                     self.depart_cube = self.axial_to_cube(hex_x, hex_y)  # Stocker les coordonnées cubiques
                 elif self.objectif_mode:
                     if self.objectif_hex:
                         # Réinitialiser l'ancienne case d'objectif
                         old_hex_x, old_hex_y = self.objectif_hex
                         current_color = self.current_hex_colors.get((old_hex_x, old_hex_y), "")
-                        self.draw_hexagon(old_hex_x, old_hex_y, self.controller.hex_size, current_color)
+                        self.hex_canvas.itemconfig(self.hexagons[(old_hex_x, old_hex_y)], fill=current_color)
                     self.objectif_hex = (hex_x, hex_y)
                     self.current_hex_colors[(hex_x, hex_y)] = self.hex_canvas.itemcget(hex_id, "fill")
-                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "red")  # Rouge pour l'objectif
+                    self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="red")
                     self.objectif_cube = self.axial_to_cube(hex_x, hex_y)  # Stocker les coordonnées cubiques
                 else:
                     if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
                         continue  # Ne pas changer la couleur de la case départ ou objectif
                     self.current_hex_colors[(hex_x, hex_y)] = self.current_color
-                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, self.current_color)
+                    self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill=self.current_color)
                 break
 
     def on_canvas_motion(self, event):
@@ -327,7 +300,7 @@ class GUI:
                 if self.hex_canvas.find_closest(x, y)[0] == hex_id:
                     if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
                         continue  # Ne pas changer la couleur de la case départ ou objectif
-                    self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, self.current_color)
+                    self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill=self.current_color)
                     break
 
     def on_canvas_release(self, event):
