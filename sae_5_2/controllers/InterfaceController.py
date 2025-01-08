@@ -1,5 +1,5 @@
 import math
-from models.Grid import Grid
+from sae_5_2.models.Grid import Grid
 
 class InterfaceController:
     def __init__(self, rows, cols):
