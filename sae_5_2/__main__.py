@@ -10,7 +10,7 @@ import random
 
 def main():
     # Crée une grille de dimensions 5x5
-    width = 10
+    width = 3
     height = 5
     grid = Grid(width, height)
 
@@ -54,13 +54,13 @@ def main():
         print("\nAucun chemin trouvé.")
 
 if __name__ == "__main__":
-    rows, cols = 10, 10
+    rows, cols = 3, 3
     hex_grid = Grid(rows, cols)
     for node in hex_grid.nodes.values():
         hex_grid.display_neighbors(node.x, node.y, node.z)
 
+    # Afficher la grille hexagonale avec les coordonnées dans la console
     hex_grid.display_grid()
-    hex_grid.display_neighbors(0, 0, 0)
 
     # LANCEMENT -----------------------------------------------------------
     root = ctk.CTk()
