@@ -91,11 +91,14 @@ class InterfaceController:
 
     def toggle_coords(self):
         if self.grid:
-            self.view.clear_canvas()
+            self.view.clear_hexagons()
             self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
 
     def update_hex_size(self, size):
         self.hex_size = int(size)
         if self.grid:
-            self.view.clear_canvas()
+            self.view.clear_hexagons()
             self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
+
+    def clear_grid(self):
+        self.grid = Grid(0, 0)  # Réinitialiser la grille

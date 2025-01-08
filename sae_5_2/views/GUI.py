@@ -74,7 +74,10 @@ class GUI:
 
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur", "Bellman-Ford", "Dijkstra", "A*"]
         for action in actions:
-            button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
+            if action == "Effacer Tout":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
+            else:
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
 
         # Zone de dessin des hexagones
@@ -140,13 +143,20 @@ class GUI:
         self.hexagons[(x, y)] = hex_id
 
     def clear_canvas(self):
+        self.reset_hexagon_colors()
+
+    def reset_hexagon_colors(self):
+        for (hex_x, hex_y), hex_id in self.hexagons.items():
+            self.draw_hexagon(hex_x, hex_y, self.controller.hex_size, "white")
+
+    def clear_hexagons(self):
         self.hex_canvas.delete("all")
         self.hexagons.clear()
         self.depart_hex = None
         self.objectif_hex = None
 
     def draw_grid(self):
-        self.clear_canvas()
+        self.clear_hexagons()
         rows = int(self.rows_entry.get())
         cols = int(self.cols_entry.get())
 
@@ -158,7 +168,7 @@ class GUI:
         self.restore_special_hexagons()
 
     def draw_max_grid(self):
-        self.clear_canvas()
+        self.clear_hexagons()
         canvas_width = self.hex_canvas.winfo_width()
         canvas_height = self.hex_canvas.winfo_height()
 
@@ -181,7 +191,7 @@ class GUI:
 
     def toggle_coords(self):
         if self.controller.grid:
-            self.clear_canvas()
+            self.clear_hexagons()
             self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
             # Restaurer les cases de départ et d'objectif
             self.restore_special_hexagons()
@@ -189,7 +199,7 @@ class GUI:
     def update_hex_size(self, size):
         self.controller.hex_size = int(size)
         if self.controller.grid:
-            self.clear_canvas()
+            self.clear_hexagons()
             self.controller.draw_hex_grid(self.controller.grid.rows, self.controller.grid.cols, self.controller.hex_size)
             # Restaurer les cases de départ et d'objectif
             self.restore_special_hexagons()
