@@ -54,7 +54,7 @@ def main():
         print("\nAucun chemin trouvé.")
 
 if __name__ == "__main__":
-    rows, cols = 3, 5
+    rows, cols = 3, 3
     hex_grid = Grid(rows, cols)
     for node in hex_grid.nodes.values():
         hex_grid.display_neighbors(node.x, node.y, node.z)

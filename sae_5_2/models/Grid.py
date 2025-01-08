@@ -28,18 +28,20 @@ class Grid:
         and an origin at the top left of the grid.
         """
         offset = 0
-        for row in range(self.rows):
-            for col in range(self.cols):
+        for col in range(self.cols):
+
+            for row in range(self.rows):
                 # Adjust horizontal offset for columns based on rows
                 x = col
                 y = row - offset
                 z = -x - y
 
-                if col%2 == 1:
-                    offset += 1
-
                 # Create the node
                 self.nodes[(x, y, z)] = Node(x, y, z)
+
+            if col % 2 == 1:
+                offset += 1
+
 
 
         # Connect neighbors
