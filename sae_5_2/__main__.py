@@ -10,7 +10,7 @@ import random
 
 def main():
     # Crée une grille de dimensions 5x5
-    width = 10
+    width = 3
     height = 5
     grid = Grid(width, height)
 
@@ -54,7 +54,7 @@ def main():
         print("\nAucun chemin trouvé.")
 
 if __name__ == "__main__":
-    rows, cols = 5, 5
+    rows, cols = 3, 5
     hex_grid = Grid(rows, cols)
     for node in hex_grid.nodes.values():
         hex_grid.display_neighbors(node.x, node.y, node.z)
