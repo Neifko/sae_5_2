@@ -1,4 +1,4 @@
-from sae_5_2.models.Node import Node
+from models.Node import Node
 
 class Grid:
     """
