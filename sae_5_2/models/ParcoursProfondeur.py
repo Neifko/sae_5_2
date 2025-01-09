@@ -1,3 +1,6 @@
+import random
+
+
 class ParcoursProfondeur:
     def __init__(self, hex_grid):
         """
@@ -34,9 +37,13 @@ class ParcoursProfondeur:
                 path_to_target = self._reconstruct_path(target_coords)
 
             current_node = self.grid.get_node(*current_coords)
-            unvisited_neighbors = [n for n in current_node.voisins.values() if (n.x, n.y, n.z) not in self.visited]
+            unvisited_neighbors = [
+                n for n in current_node.voisins.values()
+                if (n.x, n.y, n.z) not in self.visited and n.active
+            ]
 
             if unvisited_neighbors:
+                random.shuffle(unvisited_neighbors)
                 for neighbor in unvisited_neighbors:
                     neighbor_coords = (neighbor.x, neighbor.y, neighbor.z)
                     stack.append(neighbor_coords)
