@@ -27,9 +27,9 @@ class AEtoile:
         start_node = self.grid.get_node(*start_coords)
         goal_node = self.grid.get_node(*goal_coords)
 
-        open_set = [start_node]  # Liste des noeuds à évaluer, initialisée avec le noeud de départ
-        came_from = {}  # Dictionnaire pour garder la trace du chemin
-        g_score = {start_node: 0}  # Coût du chemin le plus court depuis le départ jusqu'à ce noeud
+        open_set = [start_node]                 # Liste des noeuds à évaluer, initialisée avec le noeud de départ
+        came_from = {}                          # Dictionnaire pour garder la trace du chemin
+        g_score = {start_node: 0}               # Coût du chemin le plus court depuis le départ jusqu'à ce noeud
         f_score = {start_node: self.heuristic(start_node, goal_node)}  # Estimation du coût total du départ à l'objectif en passant par ce noeud
 
         total_path = []
@@ -41,11 +41,12 @@ class AEtoile:
 
             if current == goal_node:
                 path_to_target = self.reconstruct_path(came_from, current)
+                print(f"\n came_from : {came_from}")
                 return path_to_target, total_path
 
             open_set.remove(current)
 
-            for neighbor in self.grid.get_neighbors(current.x, current.y, current.z).values():
+            for neighbor in current.voisins.values():
                 if neighbor is None or not neighbor.active:
                     continue
 

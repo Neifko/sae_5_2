@@ -15,4 +15,4 @@ class Node:
         self.active = True          # Indicateur pour dire si le noeud est un obstacle ou non (si False, il s'agit d'un obstacle)
 
     def __repr__(self):
-        return f"HexNode(x={self.x}, y={self.y}, z={self.z}, valeur={self.valeur})"
+        return f"({self.x}, {self.y}, {self.z})"
