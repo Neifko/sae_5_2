@@ -93,6 +93,8 @@ class GUI:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_profondeur)
+            elif action == "A*":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_Aetoile)
             else:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
@@ -146,6 +148,36 @@ class GUI:
         print(f"Coordonnées cubiques de départ: {depart_cubique}")
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
 
+        self.profondeur_controller.set_grid(self.controller.grid)
+        path_to_target, total_path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path_to_target}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, total_path)
+
+    def call_Aetoile(self):
+        """
+        Fonction d'écoute pour le bouton A*.
+        """
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+        
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
         self.profondeur_controller.set_grid(self.controller.grid)
         path_to_target, total_path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
 

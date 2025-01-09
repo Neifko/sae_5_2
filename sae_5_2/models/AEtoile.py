@@ -3,6 +3,9 @@ from sae_5_2.models.Node import Node
 
 
 class AEtoile:
+    """
+    Classe AEtoile.py (A*) : Implementation de l'algorithme A*
+    """
     def __init__(self, grid:Grid):
         """
         Constructeur de la classe AEtoile qui prend en paramètre une grille de noeuds.
@@ -11,14 +14,15 @@ class AEtoile:
 
     def heuristic(self, node1:Node, node2:Node) -> int:
         """
-        Fonction heuristique pour estimer la distance entre deux noeuds.
+        Méthode heuristique pour estimer la distance entre deux noeuds.
         Utilise la distance de Manhattan pour les coordonnées cubiques.
         """
         return max(abs(node1.x - node2.x), abs(node1.y - node2.y), abs(node1.z - node2.z))
 
     def a_star(self, start_coords:tuple, goal_coords:tuple):
         """
-        Algorithme A* pour trouver le chemin le plus court entre deux noeuds.
+        Méthode a_star qui permet qui réalise le parcours A* et explore les chemins.
+        Prend en paramètre les coordonées de départ et d'arrivée.
         """
         start_node = self.grid.get_node(*start_coords)
         goal_node = self.grid.get_node(*goal_coords)
@@ -43,14 +47,9 @@ class AEtoile:
 
                 tentative_g_score = g_score[current] + neighbor.valeur
 
-                """
-                Logique pour évaluer le voisin et mettre à jour les valeurs si nécessaire.
-                Si le voisin n'a pas encore été évalué ou si le nouveau chemin est meilleur que l'ancien,
-                alors on met à jour les valeurs et on l'ajoute à la liste des noeuds à évaluer (s'il n'y est pas encore).
-                """
-                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                    came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g_score
+                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:                # Logique pour évaluer le voisin et mettre à jour les valeurs si nécessaire.
+                    came_from[neighbor] = current                                                   # Si le voisin n'a pas encore été évalué ou si le nouveau chemin est meilleur que l'ancien,
+                    g_score[neighbor] = tentative_g_score                                           # alors on met à jour les valeurs et on l'ajoute à la liste des noeuds à évaluer (s'il n'y est pas encore).
                     f_score[neighbor] = tentative_g_score + self.heuristic(neighbor, goal_node)
                     if neighbor not in open_set:
                         open_set.append(neighbor)
@@ -59,7 +58,8 @@ class AEtoile:
 
     def reconstruct_path(self, came_from:dict, current:Node) -> list:
         """
-        Reconstruit le chemin à partir du dictionnaire came_from.
+        Méthode reconstruct_path qui permet de construire le chemin idéal après l'exploration
+        faite par le parcours.
         """
         total_path = [current]
         while current in came_from:
