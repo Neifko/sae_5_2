@@ -1,20 +1,20 @@
 class ParcoursProfondeur:
     def __init__(self, hex_grid):
         """
-        Initialiser le parcours en profondeur sur une grille hexagonale.
-        :param hex_grid: Grille hexagonale
+        Initialize depth-first search on a hexagonal grid.
+        :param hex_grid: Hexagonal grid
         """
         self.grid = hex_grid
-        self.visited = set()  # Ensemble pour suivre les nœuds visités
-        self.parent = {}  # Dictionnaire pour suivre les parents des nœuds
-        self.total_path = []  # Liste pour suivre le chemin total parcouru
+        self.visited = set()  # Set to track visited nodes
+        self.parent = {}  # Dictionary to track parent nodes
+        self.total_path = []  # List to track the total path traversed
 
     def parcours(self, start_coords, target_coords):
         """
-        Parcours en profondeur
-        :param start_coords: Coordonnées de départ (x, y, z)
-        :param target_coords: Coordonnées d'arrivée (x, y, z)
-        :return: Tuple contenant le chemin vers la cible et le chemin total parcouru
+        Depth-first search
+        :param start_coords: Starting coordinates (x, y, z)
+        :param target_coords: Target coordinates (x, y, z)
+        :return: Tuple containing the path to the target and the total path traversed
         """
         stack = [start_coords]
         self.visited = set()
@@ -25,6 +25,7 @@ class ParcoursProfondeur:
         while stack:
             current_coords = stack.pop()
             if current_coords in self.visited:
+                self.total_path.append(current_coords)  # Add the current node again when backtracking
                 continue
 
             self.visited.add(current_coords)
@@ -40,13 +41,13 @@ class ParcoursProfondeur:
                     stack.append(neighbor_coords)
                     self.parent[neighbor_coords] = current_coords
 
-        return path_to_target, self.total_path  # Retourne le chemin vers le nœud cible et le chemin total parcouru
+        return path_to_target, self.total_path  # Return the path to the target node and the total path traversed
 
     def _reconstruct_path(self, target_coords):
         """
-        Reconstruit le chemin à partir des coordonnées cibles en utilisant le dictionnaire des parents.
-        :param target_coords: Coordonnées d'arrivée (x, y, z)
-        :return: Chemin complet sous forme de liste de coordonnées
+        Reconstruct the path from the target coordinates using the parent dictionary.
+        :param target_coords: Target coordinates (x, y, z)
+        :return: Complete path as a list of coordinates
         """
         path = []
         current_coords = target_coords
