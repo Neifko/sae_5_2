@@ -1,9 +1,9 @@
 import customtkinter as ctk
 import math
+import tkinter as tk
 from tkinter import Canvas
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
-
 
 class GUI:
     def __init__(self, root, controller, rows, cols):
@@ -113,6 +113,7 @@ class GUI:
         # Dictionnaire pour stocker les couleurs précédentes des hexagones
         self.current_hex_colors = {}
         self.hex_id_get_coords = {}
+        self.incoming_arrows = {}
 
     def axial_to_cube(self, q, r):
         x = q
@@ -128,18 +129,50 @@ class GUI:
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
 
-        print(self.hex_id_get_coords)
-
-        print(f"Coordonnées axiales de départ: {self.depart_hex}")
-        print(f"Coordonnées axiales d'objectif: {self.objectif_hex}")
-
-        print(f"hex id depart : {self.hexagons[self.depart_hex]}")
-        print(f"hex id objectif : {self.hexagons[self.objectif_hex]}")
-
         print(f"Coordonnées cubiques de départ: {depart_cubique}")
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
 
-        # self.profondeur_controller.execute(self.depart_hex, self.objectif_hex)
+        self.profondeur_controller.set_grid(self.controller.grid)
+        path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
+
+        if path:
+            print(f"Chemin trouvé : {path}")
+            self.draw_path(path)
+        else:
+            print("Aucun chemin trouvé.")
+
+    def draw_arrow(self, x1, y1, x2, y2, color="red"):
+        self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
+    def draw_arrow2(self, x1, y1, x2, y2, color="grey"):
+        self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
+
+    def draw_path(self, path):
+        if not path:
+            return
+
+        # Dessiner le chemin avec des flèches
+        for i in range(len(path) - 1):
+            coords1 = path[i]
+            coords2 = path[i + 1]
+
+            # Vérifier que les coordonnées existent dans le dictionnaire
+            if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+
+                # Obtenir les sommets des hexagones
+                points1 = self.hex_canvas.coords(hex_id1)
+                points2 = self.hex_canvas.coords(hex_id2)
+
+                if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                    # Calculer les centres des hexagones
+                    center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                    center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                    center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                    center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+
+                    # Dessiner une flèche entre les deux centres
+                    self.draw_arrow(center1_x, center1_y, center2_x, center2_y)
 
     def set_depart(self):
         self.depart_mode = True
