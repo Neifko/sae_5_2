@@ -19,25 +19,29 @@ class AEtoile:
         """
         return max(abs(node1.x - node2.x), abs(node1.y - node2.y), abs(node1.z - node2.z))
 
-    def a_star(self, start_coords:tuple, goal_coords:tuple):
+    def parcours(self, start_coords: tuple, goal_coords: tuple):
         """
-        Méthode a_star qui permet qui réalise le parcours A* et explore les chemins.
+        Méthode parcours qui permet qui réalise le parcours A* et explore les chemins.
         Prend en paramètre les coordonées de départ et d'arrivée.
         """
         start_node = self.grid.get_node(*start_coords)
         goal_node = self.grid.get_node(*goal_coords)
 
-        open_set = [start_node]                 # Liste des noeuds à évaluer, initialisée avec le noeud de départ
-        came_from = {}                          # Dictionnaire pour garder la trace du chemin
-        g_score = {start_node: 0}               # Coût du chemin le plus court depuis le départ jusqu'à ce noeud
+        open_set = [start_node]  # Liste des noeuds à évaluer, initialisée avec le noeud de départ
+        came_from = {}  # Dictionnaire pour garder la trace du chemin
+        g_score = {start_node: 0}  # Coût du chemin le plus court depuis le départ jusqu'à ce noeud
         f_score = {start_node: self.heuristic(start_node, goal_node)}  # Estimation du coût total du départ à l'objectif en passant par ce noeud
+
+        total_path = []
 
         while open_set:
             # Trouver le noeud dans open_set avec le plus petit f_score
             current = min(open_set, key=lambda node: f_score.get(node, float('inf')))
+            total_path.append((current.x, current.y, current.z))
 
             if current == goal_node:
-                return self.reconstruct_path(came_from, current)
+                path_to_target = self.reconstruct_path(came_from, current)
+                return path_to_target, total_path
 
             open_set.remove(current)
 
@@ -54,9 +58,9 @@ class AEtoile:
                     if neighbor not in open_set:
                         open_set.append(neighbor)
 
-        return None
+        return None, total_path
 
-    def reconstruct_path(self, came_from:dict, current:Node) -> list:
+    def reconstruct_path(self, came_from: dict, current: Node) -> list:
         """
         Méthode reconstruct_path qui permet de construire le chemin idéal après l'exploration
         faite par le parcours.
@@ -66,4 +70,4 @@ class AEtoile:
             current = came_from[current]
             total_path.append(current)
         total_path.reverse()
-        return total_path
+        return [(node.x, node.y, node.z) for node in total_path]

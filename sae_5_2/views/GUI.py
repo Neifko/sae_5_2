@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import Canvas
 from sae_5_2.controllers.InterfaceController import InterfaceController
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
+from sae_5_2.controllers.AEtoileController import AEtoileController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
 class GUI:
@@ -17,6 +18,7 @@ class GUI:
         self.interface_controller = None
 
         self.profondeur_controller = ProfondeurController()
+        self.a_etoile_controller = AEtoileController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -178,8 +180,8 @@ class GUI:
 
         print(f"Coordonnées cubiques de départ: {depart_cubique}")
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
-        self.profondeur_controller.set_grid(self.controller.grid)
-        path_to_target, total_path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
+        self.a_etoile_controller.set_grid(self.controller.grid)
+        path_to_target, total_path = self.a_etoile_controller.execute(depart_cubique, arrive_cubique)
 
         if path_to_target:
             print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
