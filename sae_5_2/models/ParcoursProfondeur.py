@@ -43,16 +43,13 @@ class ParcoursProfondeur:
             ]
 
             if unvisited_neighbors:
-                random.shuffle(unvisited_neighbors)
                 for neighbor in unvisited_neighbors:
                     neighbor_coords = (neighbor.x, neighbor.y, neighbor.z)
                     stack.append(neighbor_coords)
                     self.parent[neighbor_coords] = current_coords
             else:
-                # Ensure proper backtracking by checking the parent node
-                while stack and current_coords in self.visited:
-                    current_coords = stack.pop()
-                if current_coords in self.parent:
+                # Backtrack to the parent node if no unvisited neighbors
+                if self.parent[current_coords] is not None:
                     stack.append(self.parent[current_coords])
                     self.total_path.append(self.parent[current_coords])
 
