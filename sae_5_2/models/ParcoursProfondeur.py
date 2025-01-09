@@ -39,7 +39,7 @@ class ParcoursProfondeur:
             current_node = self.grid.get_node(*current_coords)
             unvisited_neighbors = [
                 n for n in current_node.voisins.values()
-                if (n.x, n.y, n.z) not in self.visited and n.active
+                if (n.x, n.y, n.z) not in self.visited
             ]
 
             if unvisited_neighbors:
@@ -48,10 +48,8 @@ class ParcoursProfondeur:
                     stack.append(neighbor_coords)
                     self.parent[neighbor_coords] = current_coords
             else:
-            # Ensure proper backtracking by checking the parent node
-                while stack and (current_coords in self.visited or not self.grid.get_node(*current_coords).active):
-                    current_coords = stack.pop()
-                if current_coords in self.parent and self.grid.get_node(*self.parent[current_coords]).active:
+                # Ensure proper backtracking by checking the parent node
+                if current_coords in self.parent:
                     stack.append(self.parent[current_coords])
                     self.total_path.append(self.parent[current_coords])
 
