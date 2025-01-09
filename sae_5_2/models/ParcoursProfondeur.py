@@ -48,10 +48,13 @@ class ParcoursProfondeur:
                     stack.append(neighbor_coords)
                     self.parent[neighbor_coords] = current_coords
             else:
-                # Backtrack to the parent node if no unvisited neighbors
-                if self.parent[current_coords] is not None:
+                # Ensure proper backtracking by checking the parent node
+                while stack and current_coords in self.visited:
+                    current_coords = stack.pop()
+                if current_coords in self.parent:
                     stack.append(self.parent[current_coords])
                     self.total_path.append(self.parent[current_coords])
+
 
         return path_to_target, self.total_path  # Return the path to the target node and the total path traversed
 
