@@ -3,6 +3,7 @@ import math
 import random
 import tkinter as tk
 from tkinter import Canvas
+from sae_5_2.controllers.InterfaceController import InterfaceController
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
@@ -12,6 +13,8 @@ class GUI:
         self.root = root
         self.root.title("Hexagones")
         self.root.geometry("1000x600")
+
+        self.interface_controller = None
 
         self.profondeur_controller = ProfondeurController()
 
@@ -104,6 +107,8 @@ class GUI:
         # Variables pour suivre l'état des boutons
         self.depart_mode = False
         self.objectif_mode = False
+        # Variable pour suivre si un chemin a été dessiné
+        self.path_drawn = False
 
         # Variables pour suivre les hexagones de départ et d'objectif
         self.depart_hex = None
@@ -128,6 +133,9 @@ class GUI:
         return (x, y, z)
 
     def call_profondeur(self):
+        if self.path_drawn:
+            self.clear_results()    
+
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
@@ -163,6 +171,21 @@ class GUI:
             color = random.choice(self.colors)
             self.hex_canvas.itemconfig(hex_id, fill=color)
 
+            # Désactiver les cases noires
+            if color == "Black":
+                if self.interface_controller is not None:
+                    grid = self.interface_controller.grid
+                    node_modif = grid.get_node(*self.hex_id_get_coords[self.hexagons[(hex_x, hex_y)]])
+                    node_modif.active = False
+                    print(f"Node ({hex_x}, {hex_y}) désactivé")
+            else:
+                if self.interface_controller is not None:
+                    grid = self.interface_controller.grid
+                    node_modif = grid.get_node(*self.hex_id_get_coords[self.hexagons[(hex_x, hex_y)]])
+                    node_modif.active = True
+                    print(f"Node ({hex_x}, {hex_y}) activé")
+
+
     def draw_arrow(self, x1, y1, x2, y2, color="#9900CC"):
         self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
     def draw_arrow2(self, x1, y1, x2, y2, color="grey"):
@@ -174,6 +197,12 @@ class GUI:
 
         # Dictionnaire pour stocker les identifiants des flèches grises
         self.arrow_ids = {}
+
+        # Variable pour suivre les nœuds visités
+        visited_nodes = set()
+        if self.depart_hex:
+            depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+            visited_nodes.add(depart_coords)
 
         # Dessiner le chemin parcouru complet avec des flèches grises
         for i in range(len(total_path) - 1):
@@ -196,30 +225,33 @@ class GUI:
                     center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
                     center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
 
-                    if i > 0 and total_path[i - 1] == coords2:
-                        continue
+                    # Vérifier si le nœud suivant a déjà été visité
+                    if coords2 not in visited_nodes:
+                        # Dessiner une flèche grise entre les deux centres
+                        arrow_id = self.hex_canvas.create_line(center1_x, center1_y, center2_x, center2_y, fill="grey", arrow=tk.LAST, width=5)
+                        self.arrow_ids[(coords1, coords2)] = arrow_id
 
-                    # Dessiner une flèche grise entre les deux centres
-                    arrow_id = self.hex_canvas.create_line(center1_x, center1_y, center2_x, center2_y, fill="grey", arrow=tk.LAST, width=5)
-                    self.arrow_ids[(coords1, coords2)] = arrow_id
+                        # Ajouter un délai pour voir le chemin se dessiner progressivement
+                        self.root.after(5)  # Définir le délai en millisecondes
+                        self.root.update()
 
-                    # Ajouter un délai pour voir le chemin se dessiner progressivement
-                    self.root.after(10)  # Définir le délai en millisecondes
-                    self.root.update()
+                    # Ajouter le nœud suivant à l'ensemble des nœuds visités
+                    visited_nodes.add(coords2)
 
-        # Dessiner le chemin vers la cible en changeant la couleur des flèches
+        # Modifier la couleur des flèches existantes en violet pour le chemin vers la cible
         if path_to_target:
             for i in range(len(path_to_target) - 1):
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
 
-                # Vérifier que les coordonnées existent dans le dictionnaire des flèches
+                # Vérifier que les coordonnées existent dans le dictionnaire
                 if (coords1, coords2) in self.arrow_ids:
                     arrow_id = self.arrow_ids[(coords1, coords2)]
-                    self.hex_canvas.itemconfig(arrow_id, fill="#9900CC")
+                    # Modifier la couleur de la flèche en violet
+                    self.hex_canvas.itemconfig(arrow_id, fill="purple")
 
                     # Ajouter un délai pour voir le chemin se dessiner progressivement
-                    self.root.after(5)  # Définir le délai en millisecondes
+                    self.root.after(2)  # Définir le délai en millisecondes
                     self.root.update()
 
     def set_depart(self):
@@ -271,9 +303,20 @@ class GUI:
     def clear_canvas(self):
         self.reset_hexagon_colors()
         self.clear_arrows()
+        self.reactivate_all_nodes()
+        self.depart_hex = None  
+        self.objectif_hex = None
+        self.path_drawn = False
+
+    def reactivate_all_nodes(self):
+        if self.interface_controller is not None:
+            grid = self.interface_controller.grid
+            for node in grid.nodes.values():
+                node.active = True
 
     def clear_results(self):
         self.clear_arrows()
+        self.path_drawn = False
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
@@ -380,6 +423,17 @@ class GUI:
                         continue  # Ne pas changer la couleur de la case départ ou objectif
                     self.current_hex_colors[(hex_x, hex_y)] = self.current_color
                     self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill=self.current_color)
+                    print(self.current_color)
+
+                    if self.interface_controller is not None:
+                        grid = self.interface_controller.grid
+                        node_modif = grid.get_node(*self.hex_id_get_coords[self.hexagons[(hex_x, hex_y)]])
+                        if self.current_color == "Black":
+                            node_modif.active = False
+                            print("Node désactivé")
+                        else:
+                            print("Pas desactivé")
+
                 break
 
     def on_canvas_motion(self, event):
@@ -390,7 +444,19 @@ class GUI:
                 if self.hex_canvas.find_closest(x, y)[0] == hex_id:
                     if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
                         continue  # Ne pas changer la couleur de la case départ ou objectif
+                    self.current_hex_colors[(hex_x, hex_y)] = self.current_color
                     self.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill=self.current_color)
+                    print(self.current_color)
+
+                    if self.interface_controller is not None:
+                        grid = self.interface_controller.grid
+                        node_modif = grid.get_node(*self.hex_id_get_coords[self.hexagons[(hex_x, hex_y)]])
+                        if self.current_color == "Black":
+                            node_modif.active = False
+                            print("Node désactivé")
+                        else:
+                            print("Pas désactivé")
+
                     break
 
     def on_canvas_release(self, event):

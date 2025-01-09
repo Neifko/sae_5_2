@@ -9,6 +9,7 @@ class InterfaceController:
 
     def set_view(self, view):
         self.view = view
+        view.interface_controller = self
 
     def draw_grid(self):
         self.view.clear_canvas()
