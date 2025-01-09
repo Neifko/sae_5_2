@@ -82,6 +82,8 @@ class GUI:
         for action in actions:
             if action == "Effacer Tout":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
+            elif action == "Effacer Résultats":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_results)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_profondeur)
             else:
@@ -133,27 +135,36 @@ class GUI:
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
 
         self.profondeur_controller.set_grid(self.controller.grid)
-        path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
+        path_to_target, total_path = self.profondeur_controller.execute(depart_cubique, arrive_cubique)
 
-        if path:
-            print(f"Chemin trouvé : {path}")
-            self.draw_path(path)
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path_to_target}")
         else:
-            print("Aucun chemin trouvé.")
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, total_path)
+
 
     def draw_arrow(self, x1, y1, x2, y2, color="red"):
         self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
     def draw_arrow2(self, x1, y1, x2, y2, color="grey"):
         self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
 
-    def draw_path(self, path):
-        if not path:
+    def draw_path(self, path_to_target, total_path):
+        if not total_path:
             return
 
-        # Dessiner le chemin avec des flèches
-        for i in range(len(path) - 1):
-            coords1 = path[i]
-            coords2 = path[i + 1]
+        # Dictionnaire pour stocker les identifiants des flèches grises
+        self.arrow_ids = {}
+
+        # Dessiner le chemin parcouru complet avec des flèches grises
+        for i in range(len(total_path) - 1):
+            coords1 = total_path[i]
+            coords2 = total_path[i + 1]
 
             # Vérifier que les coordonnées existent dans le dictionnaire
             if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
@@ -171,8 +182,52 @@ class GUI:
                     center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
                     center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
 
-                    # Dessiner une flèche entre les deux centres
-                    self.draw_arrow(center1_x, center1_y, center2_x, center2_y)
+                    # Vérifier si la case est bloquante
+                    if self.is_blocking_case(coords2):
+                        # Trouver la prochaine case non bloquante dans total_path
+                        for j in range(i + 1, len(total_path)):
+                            next_coords = total_path[j]
+                            if not self.is_blocking_case(next_coords):
+                                coords2 = next_coords
+                                hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+                                points2 = self.hex_canvas.coords(hex_id2)
+                                center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                                center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+                                break
+
+                    # Dessiner une flèche grise entre les deux centres
+                    arrow_id = self.hex_canvas.create_line(center1_x, center1_y, center2_x, center2_y, fill="grey", arrow=tk.LAST, width=5)
+                    self.arrow_ids[(coords1, coords2)] = arrow_id
+
+                    # Ajouter un délai pour voir le chemin se dessiner progressivement
+                    self.root.after(25)  # Définir le délai en millisecondes
+                    self.root.update()
+
+        # Dessiner le chemin vers la cible en changeant la couleur des flèches
+        if path_to_target:
+            for i in range(len(path_to_target) - 1):
+                coords1 = path_to_target[i]
+                coords2 = path_to_target[i + 1]
+
+                # Vérifier que les coordonnées existent dans le dictionnaire des flèches
+                if (coords1, coords2) in self.arrow_ids:
+                    arrow_id = self.arrow_ids[(coords1, coords2)]
+                    self.hex_canvas.itemconfig(arrow_id, fill="red")
+
+                    # Ajouter un délai pour voir le chemin se dessiner progressivement
+                    self.root.after(25)  # Définir le délai en millisecondes
+                    self.root.update()
+
+
+    def is_blocking_case(self, coords):
+        # Vérifie si les coordonnées correspondent à une case bloquante
+        hex_id = [key for key, value in self.hex_id_get_coords.items() if value == coords]
+        if hex_id:
+            hex_id = hex_id[0]
+            return self.hex_canvas.itemcget(hex_id, "fill") == "Black"
+        return False
+
+
 
     def set_depart(self):
         self.depart_mode = True
@@ -222,10 +277,19 @@ class GUI:
 
     def clear_canvas(self):
         self.reset_hexagon_colors()
+        self.clear_arrows()
+
+    def clear_results(self):
+        self.clear_arrows()
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
             self.hex_canvas.itemconfig(hex_id, fill="white")
+
+    def clear_arrows(self):
+        for arrow_id in self.arrow_ids.values():
+            self.hex_canvas.delete(arrow_id)
+        self.arrow_ids.clear()
 
     def clear_hexagons(self):
         self.hex_canvas.delete("all")
