@@ -39,7 +39,7 @@ class ParcoursProfondeur:
             current_node = self.grid.get_node(*current_coords)
             unvisited_neighbors = [
                 n for n in current_node.voisins.values()
-                if (n.x, n.y, n.z) not in self.visited
+                if (n.x, n.y, n.z) not in self.visited and n.active
             ]
 
             if unvisited_neighbors:
