@@ -1,4 +1,3 @@
-
 class ParcoursProfondeur:
     def __init__(self, hex_grid):
         """
@@ -35,12 +34,18 @@ class ParcoursProfondeur:
                 path_to_target = self._reconstruct_path(target_coords)
 
             current_node = self.grid.get_node(*current_coords)
-            # Ensure neighbors are added in a specific order if needed
-            for neighbor in sorted(current_node.voisins.values(), key=lambda n: (n.x, n.y, n.z)):
-                neighbor_coords = (neighbor.x, neighbor.y, neighbor.z)
-                if neighbor and neighbor_coords not in self.visited:
+            unvisited_neighbors = [n for n in current_node.voisins.values() if (n.x, n.y, n.z) not in self.visited]
+
+            if unvisited_neighbors:
+                for neighbor in unvisited_neighbors:
+                    neighbor_coords = (neighbor.x, neighbor.y, neighbor.z)
                     stack.append(neighbor_coords)
                     self.parent[neighbor_coords] = current_coords
+            else:
+                # Backtrack to the parent node if no unvisited neighbors
+                if self.parent[current_coords] is not None:
+                    stack.append(self.parent[current_coords])
+                    self.total_path.append(self.parent[current_coords])
 
         return path_to_target, self.total_path  # Return the path to the target node and the total path traversed
 
