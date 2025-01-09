@@ -196,19 +196,6 @@ class GUI:
                     center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
                     center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
 
-                    # Vérifier si la case est bloquante
-                    if self.is_blocking_case(coords2):
-                        # Trouver la prochaine case non bloquante dans total_path
-                        for j in range(i + 1, len(total_path)):
-                            next_coords = total_path[j]
-                            if not self.is_blocking_case(next_coords):
-                                coords2 = next_coords
-                                hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
-                                points2 = self.hex_canvas.coords(hex_id2)
-                                center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
-                                center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
-                                break
-                    
                     if i > 0 and total_path[i - 1] == coords2:
                         continue
 
@@ -234,18 +221,6 @@ class GUI:
                     # Ajouter un délai pour voir le chemin se dessiner progressivement
                     self.root.after(5)  # Définir le délai en millisecondes
                     self.root.update()
-
-
-
-    def is_blocking_case(self, coords):
-        # Vérifie si les coordonnées correspondent à une case bloquante
-        hex_id = [key for key, value in self.hex_id_get_coords.items() if value == coords]
-        if hex_id:
-            hex_id = hex_id[0]
-            return self.hex_canvas.itemcget(hex_id, "fill") == "Black"
-        return False
-
-
 
     def set_depart(self):
         self.depart_mode = True
