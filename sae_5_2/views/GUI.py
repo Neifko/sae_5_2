@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import math
+import random
 import tkinter as tk
 from tkinter import Canvas
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
@@ -22,6 +23,7 @@ class GUI:
         self.color_buttons_frame.pack(side=ctk.LEFT, padx=10, pady=10, fill=ctk.Y)
 
         colors = ["Black", "White", "Blue", "Green", "Yellow", "Départ", "Objectif"]
+        self.colors = ["Black", "White", "Blue", "Green", "Yellow"]
         for color in colors:
             if color == "Départ":
                 button = ctk.CTkButton(self.color_buttons_frame, text=color, command=self.set_depart)
@@ -84,6 +86,8 @@ class GUI:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_canvas)
             elif action == "Effacer Résultats":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.clear_results)
+            elif action == "Aléatoire":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_profondeur)
             else:
@@ -148,6 +152,16 @@ class GUI:
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
 
+    def random_case_colors(self):
+        # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
+        for (hex_x, hex_y), hex_id in self.hexagons.items():
+            # Ne pas changer la couleur des cases de départ et d'objectif
+            if (hex_x, hex_y) == self.depart_hex or (hex_x, hex_y) == self.objectif_hex:
+                continue
+
+            # Choisir une couleur aléatoire parmi les couleurs disponibles
+            color = random.choice(self.colors)
+            self.hex_canvas.itemconfig(hex_id, fill=color)
 
     def draw_arrow(self, x1, y1, x2, y2, color="#9900CC"):
         self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
