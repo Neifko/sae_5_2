@@ -47,6 +47,10 @@ class Dijkstra:
         # Dictionnaire pour garder une trace des node précédents dans le chemin
         previous_nodes = {node: None for node in grid.nodes.values()}
 
+        all_paths = {node: [] for node in grid.nodes.values()}
+        all_paths[start_node] = [[start_node]]
+
+
         # Boucle principale de l'algorithme de Dijkstra
         while priority_queue:
             # Récupère le nœud avec la plus petite distance (file de priorité)
@@ -54,12 +58,16 @@ class Dijkstra:
 
             # Si on a atteint le node target, on s'arrete
             if current_node == target_node:
-                break
+                continue
 
             # on vérifie les voisins du node actuel
             for neighbor in current_node.voisins.values():
-                # Calcul la distance au voisin
-                distance = current_distance + 1  # ######################## 1 pour le moment
+
+                if not neighbor.active:
+                    continue
+
+                # Calcul la distance totale au voisin
+                distance = current_distance + neighbor.valeur
 
                 # Si une distance plus courte est trouvée, on met à jour
                 if distance < distances[neighbor]:
@@ -68,14 +76,26 @@ class Dijkstra:
                     # Ajoute le voisin à la file de priorité avec la nouvelle distance
                     heappush(priority_queue, (distance, id(neighbor), neighbor))
 
-        # Reconstruction du chemin à partir du dictionnaire `previous_nodes`
-        path = []
+                    all_paths[neighbor] = [path + [neighbor] for path in all_paths[current_node]]
+
+                elif distance == distances[neighbor]:
+                    all_paths[neighbor].extend(path + [neighbor] for path in all_paths[current_node])
+
+        # Reconstruction du chemin à partir du dictionnaire previous_nodes
+        best_path = []
         current = target_node
         while current is not None:
-            path.append(current)
+            best_path.append(current)
             current = previous_nodes[current]
 
-        # Le chemin est reconstruit à l'envers, on le renverse
-        path.reverse()
+        # Le chemin est reconstruit à l'envers, on doit le renverser
+        if distances[target_node] == 'inf' or best_path == [target_node]:
+            return None, None, None
 
-        return distances[target_node], path
+        best_path.reverse()
+
+
+
+        all_paths_to_target = all_paths[target_node]
+
+        return distances[target_node], best_path, all_paths_to_target
