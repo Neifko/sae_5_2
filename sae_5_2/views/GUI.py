@@ -489,7 +489,7 @@ class GUI:
         path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
         total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
 
-        print(path)
+        # print(path)
 
         if path_to_target:
             print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
