@@ -247,9 +247,12 @@ class GUI:
             for i in range(len(path_to_target) - 1):
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
+                print(coords1, coords2)
+                print(self.arrow_ids)
 
                 # Vérifier que les coordonnées existent dans le dictionnaire
                 if (coords1, coords2) in self.arrow_ids:
+                    print("oui")
                     arrow_id = self.arrow_ids[(coords1, coords2)]
                     # Modifier la couleur de la flèche en violet
                     self.hex_canvas.itemconfig(arrow_id, fill="purple")

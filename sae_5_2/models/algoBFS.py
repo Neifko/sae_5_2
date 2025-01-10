@@ -58,6 +58,7 @@ class AlgoBFS:
                 if neighbor not in visited:
                     queue.append(neighbor)
                     visited[neighbor] = current
+                    #self.total_path.append(current)  # Ajoute le nœud actuel au chemin total parcouru
 
         return [], self.total_path  # Retourne une liste vide si aucun chemin n'existe, et le chemin total parcouru
 
