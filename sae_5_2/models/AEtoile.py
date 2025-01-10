@@ -74,15 +74,16 @@ class AEtoile:
         total_path.reverse()
         return [(node.x, node.y, node.z) for node in total_path]
 
+
     def construct_total_path(self, came_from: dict, start_node: Node, goal_node: Node) -> list:
         """
         Méthode pour construire le chemin complet basé sur came_from.
         """
-        total_path = []
-        current = goal_node
-        while current != start_node:
-            total_path.append((current.x, current.y, current.z))
-            current = came_from[current]
+        total_path = [(start_node.x, start_node.y, start_node.z)]
+        for node, parent in came_from.items():
+            total_path.append((node.x, node.y, node.z))
+            total_path.append((parent.x, parent.y, parent.z))
         total_path.append((start_node.x, start_node.y, start_node.z))
-        total_path.reverse()
+        total_path.append((goal_node.x, goal_node.y, goal_node.z))
         return total_path
+
