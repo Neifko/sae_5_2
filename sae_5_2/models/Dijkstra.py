@@ -88,14 +88,17 @@ class Dijkstra:
             best_path.append(current)
             current = previous_nodes[current]
 
-        # Le chemin est reconstruit à l'envers, on doit le renverser
-        if distances[target_node] == 'inf' or best_path == [target_node]:
+        if distances[target_node] == float('inf') or best_path == [target_node]:
             return None, None, None
 
+        # Le chemin est reconstruit à l'envers, on doit le renverser
         best_path.reverse()
 
+        best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
+        all_paths_to_target_tuples = [
+            [(node.x, node.y, node.z) for node in path]
+            for path in all_paths[target_node]
+        ]
 
 
-        all_paths_to_target = all_paths[target_node]
-
-        return distances[target_node], best_path, all_paths_to_target
+        return distances[target_node], best_path_tuples, all_paths_to_target_tuples
