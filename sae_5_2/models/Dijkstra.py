@@ -46,6 +46,10 @@ class Dijkstra:
         # Dictionnaire pour garder une trace des node précédents dans le chemin
         previous_nodes = {node: None for node in self.grid.nodes.values()}
 
+        all_paths = {node: [] for node in self.grid.nodes.values()}
+        all_paths[start_node] = [[start_node]]
+
+
         # Boucle principale de l'algorithme de Dijkstra
         while priority_queue:
             # Récupère le nœud avec la plus petite distance (file de priorité)
@@ -71,6 +75,11 @@ class Dijkstra:
                     # Ajoute le voisin à la file de priorité avec la nouvelle distance
                     heappush(priority_queue, (distance, id(neighbor), neighbor))
 
+                    all_paths[neighbor] = [path + [neighbor] for path in all_paths[current_node]]
+
+                elif distance == distances[neighbor]:
+                    all_paths[neighbor].extend(path + [neighbor] for path in all_paths[current_node])
+
         # Reconstruction du chemin à partir du dictionnaire previous_nodes
         best_path = []
         current = target_node
@@ -84,7 +93,9 @@ class Dijkstra:
         # Le chemin est reconstruit à l'envers, on doit le renverser
         best_path.reverse()
 
+        all_paths_to_target = all_paths[target_node]
+
         best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
 
 
-        return best_path_tuples
+        return best_path_tuples, all_paths_to_target
