@@ -93,9 +93,11 @@ class Dijkstra:
         # Le chemin est reconstruit à l'envers, on doit le renverser
         best_path.reverse()
 
-        all_paths_to_target = all_paths[target_node]
-
         best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
+        all_paths_to_target_tuples = [
+            [(node.x, node.y, node.z) for node in path]
+            for path in all_paths[target_node]
+        ]
 
 
-        return best_path_tuples, all_paths_to_target
+        return best_path_tuples, all_paths_to_target_tuples
