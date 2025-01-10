@@ -432,6 +432,7 @@ class GUI:
                             node_modif.active = False
                             print("Node désactivé")
                         else:
+                            node_modif.active = True
                             print("Pas desactivé")
 
                 break
@@ -455,6 +456,7 @@ class GUI:
                             node_modif.active = False
                             print("Node désactivé")
                         else:
+                            node_modif.active = True
                             print("Pas désactivé")
 
                     break
