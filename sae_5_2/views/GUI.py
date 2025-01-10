@@ -261,10 +261,7 @@ class GUI:
         self.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=tk.LAST, width=5)
 
     def draw_path(self, path_to_target, total_path):
-        print(f"\nDessinf des paths : \n- {path_to_target}\n- {total_path}")
-
         if not total_path:
-            print("\n\nNEIN")
             return
 
         # Dictionnaire pour stocker les identifiants des flèches grises
@@ -278,16 +275,16 @@ class GUI:
 
         # Dessiner le chemin parcouru complet avec des flèches grises
         for i in range(len(total_path) - 1):
-            print(f"\n\nTotal path : {total_path[i]} et {total_path[i+1]}")
-            print(f"\n\nTotal path : {type(total_path[i])} et {type(total_path[i+1])}")
+            # print(f"\n\nTotal path : {total_path[i]} et {total_path[i+1]}")                           # DEBUG
+            # print(f"\n\nTotal path : {type(total_path[i])} et {type(total_path[i+1])}")               # DEBUG
 
             coords1 = total_path[i]
             coords2 = total_path[i + 1]
 
             # Vérifier que les coordonnées existent dans le dictionnaire
-            print(f"\n\nCoordonnées de la grille : {self.hex_id_get_coords.values()}")
+            # print(f"\n\nCoordonnées de la grille : {self.hex_id_get_coords.values()}")                # DEBUG
             if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
-                print("\n\nTRUE")
+                # print("\n\nTRUE")                                                                     # DEBUG
                 hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
                 hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
 
@@ -306,7 +303,7 @@ class GUI:
                     if coords2 not in visited_nodes:
                         # Dessiner une flèche grise entre les deux centres
                         arrow_id = self.hex_canvas.create_line(center1_x, center1_y, center2_x, center2_y, fill="grey", arrow=tk.LAST, width=5)
-                        print(f"\n\nDlèche : {coords1} ::::::: {coords2}")
+                        # print(f"\n\nFlèche : {coords1} ::::::: {coords2}")                            # DEBUG  
                         self.arrow_ids[(coords1, coords2)] = arrow_id
 
                         # Ajouter un délai pour voir le chemin se dessiner progressivement
