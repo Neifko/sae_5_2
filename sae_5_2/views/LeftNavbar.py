@@ -71,8 +71,8 @@ class LeftNavbar(ctk.CTkFrame):
     def set_color(self, c):
         self.get_controller().set_color(c)
 
-    def update_hex_size(self):
-        self.get_controller().update_hex_size()
+    def update_hex_size(self, size):
+        self.get_controller().update_hex_size(size)
 
     def toggle_coords(self):
         self.get_controller().toggle_coords()
