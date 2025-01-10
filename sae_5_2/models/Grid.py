@@ -2,15 +2,16 @@ from sae_5_2.models.Node import Node
 
 class Grid:
     """
-    Classe représentant une grille hexagonale et son graphe.
-    La grille est générée en utilisant des coordonnées cubiques.
+    Classe représentant une grille contenant des noeuds hexagonaux.
+    La grille est générée en utilisant des coordonnées cubiques (pour les déplacements qui seront fait par les algorithmes).
     """
+
     def __init__(self, rows, cols):
         """
         Constructeur de la classe Grid qui prend en paramètre le nombre de lignes et de colonnes.
         """
-        self.rows = rows  # Nombre de lignes dans la grille
-        self.cols = cols  # Nombre de colonnes dans la grille
+        self.rows = rows  
+        self.cols = cols  
         self.nodes = {}    # Dictionnaire pour stocker les nœuds
         self.directions = {
             "N": (0, -1, +1),  # Nord
@@ -24,8 +25,8 @@ class Grid:
 
     def _create_grid(self):
         """
-        Generates a hexagonal grid with a honeycomb layout
-        and an origin at the top left of the grid.
+        Méthode qui permet d'ajouter les noeuds de la grille en les créant et en les connectant entre eux.
+        Place l'origine (0, 0, 0) en bas à gauche.
         """
         offset = 0
         for col in range(self.cols):
@@ -68,6 +69,10 @@ class Grid:
         return neighbors
 
     def display_grid(self):
+        """
+        Affiche la grille en ligne de commande avec les coordonnées cubiques de chaque nœud.
+        """
+        print("Grille des noeuds (coordonnées x, y, z) :")
         for y in range(-self.rows // 2, self.rows // 2 + 1):
             line = ""
             for x in range(-self.cols // 2, self.cols // 2 + 1):
