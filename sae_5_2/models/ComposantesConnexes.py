@@ -7,29 +7,21 @@ def find_connected_components(grid):
     Trouve les composantes connexes de la grille.
     Une composante connexe est un ensemble de nœuds reliés directement ou indirectement entre eux
     :param grid: Instance de Grid
-    :return: Liste des composantes connexes (chaque composante est une liste de nœuds)
+    :return: Liste des composantes connexes (chaque composante est une liste de nœuds).
     """
     visited = set()  # Ensemble des nœuds visités
     components = []  # Liste des composantes connexes
+    dfs = ParcoursProfondeur(grid)
 
-    def parcours(node, component):
-        """Parcours en profondeur pour explorer une composante connexe."""
-        dfs = ParcoursProfondeur(grid)
-        path, total_path = dfs.parcours((node.x, node.y, node.z), None)
-        for coords in total_path:
-            n = grid.get_node(*coords)
-            if n and n.active:
-                visited.add(n)
-                component.append(coords)
-
-    # Parcourir tous les nœuds de la grille
-    for node in grid.nodes.values():
-        if node not in visited and node.active:
-            component = []  # Nouvelle composante connexe
-            parcours(node, component)
-            components.append(component)
+    for node_coords, node in grid.nodes.items():
+        if node_coords not in visited and node.active:
+            component = dfs.parcours(node_coords, None)
+            if component:
+                visited.update(component)
+                components.append(component)
 
     return components
+
 
 # Exemple d'utilisation
 if __name__ == "__main__":

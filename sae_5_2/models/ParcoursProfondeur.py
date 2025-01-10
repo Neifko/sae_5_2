@@ -26,12 +26,16 @@ class ParcoursProfondeur:
             self.visited.add(current_coords)
             path.append(current_coords)
 
-            if current_coords == target_coords:
+            if target_coords is not None and current_coords == target_coords:
                 return path
 
             current_node = self.grid.get_node(*current_coords)
             for neighbor in current_node.voisins.values():
-                if neighbor and (neighbor.x, neighbor.y, neighbor.z) not in self.visited:
+                if neighbor and neighbor.active and (neighbor.x, neighbor.y, neighbor.z) not in self.visited:
                     stack.append((neighbor.x, neighbor.y, neighbor.z))
+
+        if target_coords is None:
+            return path
+
 
         return None  # Retourne None si aucun chemin n'est trouvé
