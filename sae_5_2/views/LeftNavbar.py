@@ -1,11 +1,14 @@
 import customtkinter as ctk
 
+
 class LeftNavbar(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
         self.rows = 10
         self.cols = 10
+
+        self.parent = parent
 
         colors = ["Black", "White", "Blue", "Green", "Yellow", "Départ", "Objectif"]
 
@@ -56,24 +59,26 @@ class LeftNavbar(ctk.CTkFrame):
         self.max_button = ctk.CTkButton(self.entry_frame, text="Grille complète", command=self.draw_max_grid)
         self.max_button.pack(side=ctk.TOP, padx=5, pady=5)
 
+    def get_controller(self):
+        return self.parent.get_controller()
 
     def set_depart(self):
-        pass
+        self.get_controller().set_depart()
 
     def set_objectif(self):
-        pass
+        self.get_controller().set_objectif()
 
     def set_color(self, c):
-        pass
+        self.get_controller().set_color(c)
 
     def update_hex_size(self):
-        pass
+        self.get_controller().update_hex_size()
 
     def toggle_coords(self):
-        pass
+        self.get_controller().toggle_coords()
 
     def draw_grid(self):
-        pass
+        self.get_controller().draw_grid()
 
     def draw_max_grid(self):
-        pass
+        self.get_controller().draw_max_grid()

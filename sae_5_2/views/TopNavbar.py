@@ -4,6 +4,8 @@ class TopNavbar(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.parent = parent
+
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur",
                    "Bellman-Ford", "Dijkstra", "A*"]
         for action in actions:
@@ -19,16 +21,19 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
 
+    def get_controller(self):
+        return self.parent.get_controller()
+
     def clear_canvas(self):
-        pass
+        self.get_controller().clear_canvas()
 
     def clear_results(self):
-        pass
+        self.get_controller().clear_results()
 
     def random_case_colors(self):
-        pass
+        self.get_controller().random_case_colors()
 
     def call_profondeur(self):
-        pass
+        self.get_controller().call_profondeur()
 
 

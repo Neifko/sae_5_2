@@ -8,6 +8,8 @@ class MainFrame(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.parent = parent
+
         # Création des boutons d'action
         self.top_navbar = TopNavbar(self)
         self.top_navbar.pack(side=ctk.TOP, fill=ctk.X, padx=10, pady=5)
@@ -16,3 +18,5 @@ class MainFrame(ctk.CTkFrame):
         self.hex_canvas = GridCanvas(self)
         self.hex_canvas.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
 
+    def get_controller(self):
+        return self.parent.get_controller()
