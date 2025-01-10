@@ -3,6 +3,15 @@ from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
 
 
 class ProfondeurController:
+  
+    def __init__(self):
+        self.grid = None
+        self.parcours_profondeur = None
+
+    def set_grid(self, grid):
+        self.grid = grid
+        self.parcours_profondeur = ParcoursProfondeur(grid)
+
     def display_profondeur_in_console(self):
         # Créer une grille de taille 5x5
         hex_grid = Grid(3, 3)
@@ -28,4 +37,10 @@ class ProfondeurController:
         else:
             print(f"Aucun chemin trouvé entre {start_coords} et {target_coords}.")
 
+
         print(f"Chemin total parcouru : {total_path}")
+
+    def execute(self, start_coords, target_coords):
+        path_to_target, total_path = self.parcours_profondeur.parcours(start_coords, target_coords)
+        return path_to_target, total_path
+

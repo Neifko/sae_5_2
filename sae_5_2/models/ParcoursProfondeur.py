@@ -24,6 +24,7 @@ class ParcoursProfondeur:
         self.total_path = []  # Réinitialise le chemin total parcouru
         path_to_target = None  # Initialisation du chemin vers la cible
 
+
         while stack:
             current_coords = stack.pop()  # Récupère le noeud actuel
             if current_coords in self.visited:
@@ -76,3 +77,4 @@ class ParcoursProfondeur:
             current_coords = self.parent[current_coords]  # Passe au parent
         path.reverse()  # Inverse le chemin pour obtenir l'ordre correct
         return path  # Retourne le chemin complet
+

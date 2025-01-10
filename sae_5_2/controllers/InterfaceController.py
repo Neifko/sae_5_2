@@ -9,6 +9,7 @@ class InterfaceController:
 
     def set_view(self, view):
         self.view = view
+        view.interface_controller = self
 
     def draw_grid(self):
         self.view.clear_canvas()
@@ -70,8 +71,7 @@ class InterfaceController:
 
         # Dessiner les hexagones
         for (x, y, z), (px, py) in positions.items():
-            coord = f"({x},{y},{z})"
-            self.view.draw_hexagon(px, py, size, "white", coord if self.view.show_coords_switch.get() else None)
+            self.view.draw_hexagon(px, py, size, "white", (x, y, z))
 
     def get_direction_offset(self, direction, size):
         if direction == "N":

@@ -56,12 +56,12 @@ def main():
 
 if __name__ == "__main__":
     rows, cols = 3, 3
-    hex_grid = Grid(rows, cols)
-    for node in hex_grid.nodes.values():
-        hex_grid.display_neighbors(node.x, node.y, node.z)
+    # hex_grid = Grid(rows, cols)
+    # for node in hex_grid.nodes.values():
+    #     hex_grid.display_neighbors(node.x, node.y, node.z)
 
     # Afficher la grille hexagonale avec les coordonnées dans la console
-    hex_grid.display_grid()
+    # hex_grid.display_grid()
 
     # LANCEMENT -----------------------------------------------------------
     root = ctk.CTk()
