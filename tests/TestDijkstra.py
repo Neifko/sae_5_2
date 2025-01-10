@@ -17,7 +17,6 @@ class TestDijkstra(unittest.TestCase):
         self.grid.get_node(1, 1, -2).active = False
         self.grid.get_node(2, -1, -1).active = False
         self.grid.get_node(2, -0, -2).active = False
-        self.grid.get_node(0, 2, -2).active = True
 
         distance, best_chemin, list_all_chemin = self.dijkstra.shortest_path(
             self.grid,
@@ -25,8 +24,8 @@ class TestDijkstra(unittest.TestCase):
             (4, -2, -2)
         )
 
-        self.assertIsNotNone(best_chemin)
-        print("\ntest_shortest_path_adjacent: Chemin simple")
+        self.assertIsNotNone(best_chemin, "La cible n'est pas atteignable")
+        print("\ntest_shortest_path_adjacent: Chemin horizontal")
         print("Nombre de déplacement :", distance)
         print("Meilleur chemin trouvé :", best_chemin)
         print("Tous les autres chemins possibles :")
@@ -43,13 +42,14 @@ class TestDijkstra(unittest.TestCase):
             (0, 0, 0),
             (3, 3, -6)
         )
-        print("\ntest_shortest_path_adjacent: Chemin simple")
+        self.assertIsNotNone(best_chemin)
+        print("\ntest_shortest_path_adjacent: Chemin diagonal")
         print("Nombre de déplacement :", distance)
         print("Meilleur chemin trouvé :", best_chemin)
         print("Tous les autres chemins possibles :")
         for path in list_all_chemin:
             print(path)
-        self.assertIsNotNone(best_chemin)
+
 
     # def test_invalid_coordinates(self):
     #     with self.assertRaises(ValueError, msg="Le chemin n'est pas possible si la case est inexistante"):
