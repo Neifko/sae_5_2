@@ -19,6 +19,8 @@ class AlgoBFS:
             grid (Grid): Instance de la classe Grid représentant la grille hexagonale.
         """
         self.grid = grid  # Associe la grille fournie à l'algorithme.
+        self.total_path = []  # Liste pour suivre le chemin total parcouru
+
 
     def find_path(self, start, goal):
         """
@@ -39,14 +41,16 @@ class AlgoBFS:
         queue = [start]
         # Dictionnaire pour stocker le parent de chaque nœud visité.
         visited = {start: None}
+        self.total_path = []  # Réinitialise le chemin total parcouru
 
         # Boucle principale du BFS.
         while queue:
             current = queue.pop(0)  # Récupère le nœud actuel en début de file.
+            self.total_path.append(current)  # Ajoute le nœud actuel au chemin total parcouru
 
             # Si on atteint le nœud d'arrivée, reconstruit et retourne le chemin.
             if current == goal:
-                return self._reconstruct_path(visited, start, goal)
+                return self._reconstruct_path(visited, start, goal), self.total_path
 
             # Parcourt les voisins du nœud actuel.
             for direction, neighbor in current.voisins.items():
@@ -55,8 +59,8 @@ class AlgoBFS:
                     queue.append(neighbor)
                     visited[neighbor] = current
 
-        # Si aucun chemin n'a été trouvé, retourne une liste vide.
-        return []
+        return [], self.total_path  # Retourne une liste vide si aucun chemin n'existe, et le chemin total parcouru
+
 
     def _reconstruct_path(self, visited, start, goal):
         """
@@ -82,4 +86,4 @@ class AlgoBFS:
         path.append(start)
         # Inverse la liste pour obtenir le chemin dans l'ordre correct.
         path.reverse()
-        return path
+        return path  # Retourne le chemin complet
