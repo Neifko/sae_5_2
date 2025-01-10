@@ -12,19 +12,20 @@ class ProfondeurController:
         parcours_profondeur = ParcoursProfondeur(hex_grid)
 
         # Définir le point de départ et d'arrivée
-        start_coords = (0, 0, 0)
-        target_coords = (2,1,-3)
+        start_coords = (0, 2, -2)
+        target_coords = (2,-1,-1)
 
         # hex_grid.display_neighbors(*start_coords)
         # hex_grid.display_neighbors(*target_coords)
 
-        # Lancer DFS récursif
-        path = parcours_profondeur.parcours(start_coords, target_coords)
+        # Lancer DFS
+        path_to_target, total_path = parcours_profondeur.parcours(start_coords, target_coords)
 
         # Afficher les résultats
-        if path:
+        if path_to_target:
             print(f"Un chemin existe entre {start_coords} et {target_coords}.")
-            # print(f"Distance totale : {distance}")
-            print(f"Chemin trouvé : {path}")
+            print(f"Chemin vers la cible : {path_to_target}")
         else:
             print(f"Aucun chemin trouvé entre {start_coords} et {target_coords}.")
+
+        print(f"Chemin total parcouru : {total_path}")
