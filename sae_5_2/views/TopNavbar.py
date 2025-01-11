@@ -37,7 +37,9 @@ class TopNavbar(ctk.CTkFrame):
             elif action == "Aléatoire":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
+                button = ctk.CTkButton(self, text=action, command=self.call_profondeur)
+            elif action == "Dijkstra":
+                button = ctk.CTkButton(self, text=action, command=self.call_dijkstra)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
             elif action == "Bellman-Ford":
@@ -76,15 +78,20 @@ class TopNavbar(ctk.CTkFrame):
     def call_profondeur(self):
         self.get_controller().call_profondeur()
 
+    def call_dijkstra(self):
+        self.get_controller().call_dijkstra()
+
     def call_largeur(self):
         self.get_controller().call_largeur()
-    
+
     def call_bellman_ford(self):
         self.get_controller().call_bellmanford()
-    
+
     def call_aetoile(self):
         self.get_controller().call_aetoile()
 
+    def call_stableMax(self):
+        self.get_controller().call_stableMax()
 
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette
@@ -97,7 +104,4 @@ class TopNavbar(ctk.CTkFrame):
                 self.canvas.xview_scroll(1, "units")
 
 
-
-    def call_stableMax(self):
-        self.get_controller().call_stableMax()
 
