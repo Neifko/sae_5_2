@@ -13,6 +13,7 @@ class Dijkstra:
     def __init__(self, grid):
         self.grid = grid
 
+
     def shortest_path(self, start_coords, target_coords):
         """
         Trouve le plus court chemin entre deux node sur une grille hexagonale
@@ -20,9 +21,12 @@ class Dijkstra:
         Cette méthode utilise l'algorithme de Dijkstra pour calculer la distance minimale
         et le chemin entre le nœud de départ et le nœud cible.
 
+        :param grid: Instance de `Grid` représentant la grille hexagonale.
         :param start_coords: Tuple (x, y, z) des coordonnées cubiques du nœud de départ.
         :param target_coords: Tuple (x, y, z) des coordonnées cubiques du nœud cible.
-        :return: Liste des nodes représentant le chemin emprunté (de départ à cible)
+        :return: Tuple contenant :
+        - La distance minimale entre les deux node.
+        - Une liste des node représentant le chemin emprunté (de départ à cible).
 
         :raises ValueError: Si les coordonnées de départ ou de destination sont invalides.
         """
@@ -45,6 +49,9 @@ class Dijkstra:
 
         # Dictionnaire pour garder une trace des node précédents dans le chemin
         previous_nodes = {node: None for node in self.grid.nodes.values()}
+
+        all_paths = {node: [] for node in self.grid.nodes.values()}
+        all_paths[start_node] = [[start_node]]
 
         # Boucle principale de l'algorithme de Dijkstra
         while priority_queue:
@@ -71,6 +78,12 @@ class Dijkstra:
                     # Ajoute le voisin à la file de priorité avec la nouvelle distance
                     heappush(priority_queue, (distance, id(neighbor), neighbor))
 
+                    all_paths[neighbor] = [path + [neighbor] for path in all_paths[current_node]]
+
+                elif distance == distances[neighbor]:
+                    all_paths[neighbor].extend(path + [neighbor] for path in all_paths[current_node])
+                    all_paths[neighbor] = all_paths[neighbor][:25]
+
         # Reconstruction du chemin à partir du dictionnaire previous_nodes
         best_path = []
         current = target_node
@@ -78,13 +91,16 @@ class Dijkstra:
             best_path.append(current)
             current = previous_nodes[current]
 
-        if distances[target_node] == float('inf') or best_path == [target_node]:
-            return None
-
         # Le chemin est reconstruit à l'envers, on doit le renverser
+        if distances[target_node] == 'inf' or best_path == [target_node]:
+            return None, None
+
         best_path.reverse()
 
         best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
+        all_paths_to_target_tuples = [
+            [(node.x, node.y, node.z) for node in path]
+            for path in all_paths[target_node][:25] # limite à 25 chemins car trop long sinon
+        ]
 
-
-        return best_path_tuples
+        return best_path_tuples, all_paths_to_target_tuples

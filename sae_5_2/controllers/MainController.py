@@ -180,7 +180,7 @@ class MainController:
             print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
 
         print(f"Chemin total parcouru : {total_path}")
-
+        total_path = [total_path]
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
 
@@ -199,7 +199,7 @@ class MainController:
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
 
         self.dijkstra_controller.set_grid(self.grid)
-        path_to_target= self.dijkstra_controller.execute(depart_cubique, arrive_cubique)
+        path_to_target, all_path = self.dijkstra_controller.execute(depart_cubique, arrive_cubique)
 
         if path_to_target:
             print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
@@ -207,10 +207,11 @@ class MainController:
         else:
             print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
 
-        print(f"Chemin total parcouru : {path_to_target}")
+        for lst in all_path:
+            print(f"Chemin total parcouru : {lst}")
 
         # Dessiner les chemins
-        self.draw_path(path_to_target, path_to_target)
+        self.draw_path(path_to_target, all_path)
 
     def random_case_colors(self):
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
@@ -252,6 +253,7 @@ class MainController:
         # Dictionnaire pour stocker les identifiants des flèches grises
         self.arrow_ids = {}
 
+        self.arrows_global = list()
         # Variable pour suivre les nœuds visités
         visited_nodes = set()
         if self.depart_hex:
@@ -259,41 +261,47 @@ class MainController:
             visited_nodes.add(depart_coords)
 
         # Dessiner le chemin parcouru complet avec des flèches grises
-        for i in range(len(total_path) - 1):
-            coords1 = total_path[i]
-            coords2 = total_path[i + 1]
+        for k in total_path:
+            visited_nodes = set()
+            if self.depart_hex:
+                depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+                visited_nodes.add(depart_coords)
+            for i in range(len(k) - 1):
+                coords1 = k[i]
+                coords2 = k[i + 1]
 
-            # Vérifier que les coordonnées existent dans le dictionnaire
-            if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
-                hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
-                hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+                # Vérifier que les coordonnées existent dans le dictionnaire
+                if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                    hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                    hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
 
-                # Obtenir les sommets des hexagones
-                points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
-                points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
+                    # Obtenir les sommets des hexagones
+                    points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
+                    points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
 
-                if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
-                    # Calculer les centres des hexagones
-                    center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
-                    center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
-                    center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
-                    center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+                    if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                        # Calculer les centres des hexagones
+                        center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                        center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                        center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                        center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
 
-                    # Vérifier si le nœud suivant a déjà été visité
-                    if coords2 not in visited_nodes:
-                        # Dessiner une flèche grise entre les deux centres
-                        arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
-                                                                                    center2_y, fill="grey",
-                                                                                    arrow=ctk.LAST, width=5)
-                        self.arrow_ids[(coords1, coords2)] = arrow_id
+                        # Vérifier si le nœud suivant a déjà été visité
+                        if coords2 not in visited_nodes and (coords1, coords2) not in self.arrow_ids.keys():
+                            # Dessiner une flèche grise entre les deux centres
+                            arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
+                                                                                        center2_y, fill="grey",
+                                                                                        arrow=ctk.LAST, width=5)
+                            self.arrow_ids[(coords1, coords2)] = arrow_id
 
-                        # Ajouter un délai pour voir le chemin se dessiner progressivement
-                        # TODO : modif de delai
-                        self.main_view.after(5)  # Définir le délai en millisecondes
-                        self.main_view.update()
+                            # Ajouter un délai pour voir le chemin se dessiner progressivement
+                            # TODO : modif de delai
+                            self.main_view.after(5)  # Définir le délai en millisecondes
+                            self.main_view.update()
 
-                    # Ajouter le nœud suivant à l'ensemble des nœuds visités
-                    visited_nodes.add(coords2)
+                        # Ajouter le nœud suivant à l'ensemble des nœuds visités
+                        visited_nodes.add(coords2)
+            self.arrows_global.append(self.arrow_ids)
 
         # Modifier la couleur des flèches existantes en violet pour le chemin vers la cible
         if path_to_target:
