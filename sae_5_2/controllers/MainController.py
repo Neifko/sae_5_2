@@ -3,6 +3,7 @@ import random
 import customtkinter as ctk
 
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
+from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.models.Grid import Grid
 
 
@@ -17,6 +18,7 @@ class MainController:
 
         ### A METTRE A JOUR ###
         self.profondeur_controller = ProfondeurController()
+        self.algoBFSController = algoBFSController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -496,3 +498,38 @@ class MainController:
     def on_canvas_release(self, event):
         self.depart_mode = False
         self.objectif_mode = False
+
+
+    def call_largeur(self):
+        print("oui")
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+
+        self.algoBFSController.set_grid(self.grid)
+        path_to_target, total_path = self.algoBFSController.run_bfs(depart_cubique, arrive_cubique)
+
+        path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
+        total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
+
+        # print(path)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, total_path)
