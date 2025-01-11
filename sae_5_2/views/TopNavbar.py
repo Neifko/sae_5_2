@@ -17,6 +17,8 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self, text=action, command=self.call_profondeur)
+            elif action == "Dijkstra":
+                button = ctk.CTkButton(self, text=action, command=self.call_dijkstra)
             else:
                 button = ctk.CTkButton(self, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
@@ -35,5 +37,8 @@ class TopNavbar(ctk.CTkFrame):
 
     def call_profondeur(self):
         self.get_controller().call_profondeur()
+
+    def call_dijkstra(self):
+        self.get_controller().call_dijkstra()
 
 

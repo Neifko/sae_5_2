@@ -3,6 +3,8 @@ import random
 import customtkinter as ctk
 
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
+from sae_5_2.controllers.DijkstraController import DijkstraController
+
 from sae_5_2.models.Grid import Grid
 
 
@@ -17,6 +19,7 @@ class MainController:
 
         ### A METTRE A JOUR ###
         self.profondeur_controller = ProfondeurController()
+        self.dijkstra_controller = DijkstraController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -176,6 +179,34 @@ class MainController:
 
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
+
+    def call_dijkstra(self):
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+
+        self.dijkstra_controller.set_grid(self.grid)
+        path_to_target= self.dijkstra_controller.execute(depart_cubique, arrive_cubique)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path_to_target}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {path_to_target}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, path_to_target)
 
     def random_case_colors(self):
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire

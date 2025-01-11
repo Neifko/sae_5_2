@@ -9,7 +9,7 @@ class TestDijkstra(unittest.TestCase):
     def setUp(self):
         # Création d'une grille hexagonale 5x5
         self.grid = Grid(5, 5)
-        self.dijkstra = Dijkstra()
+        self.dijkstra = Dijkstra(self.grid)
 
     def test_shortest_path_adjacent(self):
         self.grid.get_node(2, -1, -1).valeur = 2
@@ -18,37 +18,22 @@ class TestDijkstra(unittest.TestCase):
         self.grid.get_node(2, -1, -1).active = False
         self.grid.get_node(2, -0, -2).active = False
 
-        distance, best_chemin, list_all_chemin = self.dijkstra.shortest_path(
-            self.grid,
-            (0, 0, 0),
-            (4, -2, -2)
-        )
+        best_chemin = self.dijkstra.shortest_path((4, -2, -2),
+            (0, 0, 0))
 
         self.assertIsNotNone(best_chemin, "La cible n'est pas atteignable")
         print("\ntest_shortest_path_adjacent: Chemin horizontal")
-        print("Nombre de déplacement :", distance)
         print("Meilleur chemin trouvé :", best_chemin)
-        print("Tous les autres chemins possibles :")
-        for path in list_all_chemin:
-            print(path)
 
 
     def test_shortest_path_diagonal(self):
         self.grid.get_node(0, 2, -2).valeur = 3
         self.grid.get_node(1, 1, -2).active = False
 
-        distance, best_chemin, list_all_chemin = self.dijkstra.shortest_path(
-            self.grid,
-            (0, 0, 0),
-            (3, 3, -6)
-        )
+        best_chemin = self.dijkstra.shortest_path((0, 0, 0), (3, 3, -6))
         self.assertIsNotNone(best_chemin)
         print("\ntest_shortest_path_adjacent: Chemin diagonal")
-        print("Nombre de déplacement :", distance)
         print("Meilleur chemin trouvé :", best_chemin)
-        print("Tous les autres chemins possibles :")
-        for path in list_all_chemin:
-            print(path)
 
 
     # def test_invalid_coordinates(self):
