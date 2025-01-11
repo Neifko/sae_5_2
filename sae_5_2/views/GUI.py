@@ -6,6 +6,7 @@ from tkinter import Canvas
 from sae_5_2.controllers.InterfaceController import InterfaceController
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.controllers.AEtoileController import AEtoileController
+from sae_5_2.controllers.BellmanFordController import BellmanFordController
 from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
 
 class GUI:
@@ -19,6 +20,7 @@ class GUI:
 
         self.profondeur_controller = ProfondeurController()
         self.a_etoile_controller = AEtoileController()
+        self.bellman_ford_controller = BellmanFordController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -95,6 +97,8 @@ class GUI:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_profondeur)
+            elif action == "Bellman-Ford":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_BellmanFord)
             elif action == "A*":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_Aetoile)
             else:
@@ -194,6 +198,37 @@ class GUI:
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
 
+
+    def call_BellmanFord(self):
+        """
+        Fonction d'écoute pour le bouton Bellman-Ford.
+        """
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+        self.bellman_ford_controller.set_grid(self.controller.grid)
+        path_to_target, total_path = self.bellman_ford_controller.execute(depart_cubique, arrive_cubique)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path_to_target}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, total_path)
+
     def random_case_colors(self):
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
         for (hex_x, hex_y), hex_id in self.hexagons.items():
@@ -240,11 +275,16 @@ class GUI:
 
         # Dessiner le chemin parcouru complet avec des flèches grises
         for i in range(len(total_path) - 1):
+            # print(f"\n\nTotal path : {total_path[i]} et {total_path[i+1]}")                           # DEBUG
+            # print(f"\n\nTotal path : {type(total_path[i])} et {type(total_path[i+1])}")               # DEBUG
+
             coords1 = total_path[i]
             coords2 = total_path[i + 1]
 
             # Vérifier que les coordonnées existent dans le dictionnaire
+            # print(f"\n\nCoordonnées de la grille : {self.hex_id_get_coords.values()}")                # DEBUG
             if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                # print("\n\nTRUE")                                                                     # DEBUG
                 hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
                 hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
 
@@ -263,6 +303,7 @@ class GUI:
                     if coords2 not in visited_nodes:
                         # Dessiner une flèche grise entre les deux centres
                         arrow_id = self.hex_canvas.create_line(center1_x, center1_y, center2_x, center2_y, fill="grey", arrow=tk.LAST, width=5)
+                        # print(f"\n\nFlèche : {coords1} ::::::: {coords2}")                            # DEBUG  
                         self.arrow_ids[(coords1, coords2)] = arrow_id
 
                         # Ajouter un délai pour voir le chemin se dessiner progressivement
@@ -467,6 +508,7 @@ class GUI:
                             print("Node désactivé")
                         else:
                             print("Pas desactivé")
+                            node_modif.active = True
 
                 break
 
@@ -490,7 +532,7 @@ class GUI:
                             print("Node désactivé")
                         else:
                             print("Pas désactivé")
-
+                            node_modif.active = True
                     break
 
     def on_canvas_release(self, event):
