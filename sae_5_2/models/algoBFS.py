@@ -48,12 +48,17 @@ class AlgoBFS:
             current = queue.pop(0)  # Récupère le nœud actuel en début de file.
             self.total_path.append(current)  # Ajoute le nœud actuel au chemin total parcouru
 
+            unvisited_neighbors = [
+                n for n in current.voisins.values()
+                if (n.x, n.y, n.z) not in visited and n.active
+            ]  # Liste des voisins non visités et actifs
+
             # Si on atteint le nœud d'arrivée, reconstruit et retourne le chemin.
             if current == goal:
                 return self._reconstruct_path(visited, start, goal), self.total_path
 
             # Parcourt les voisins du nœud actuel.
-            for direction, neighbor in current.voisins.items():
+            for neighbor in unvisited_neighbors:
                 # Si le voisin n'a pas encore été visité, on l'ajoute à la file et on marque son origine.
                 if neighbor not in visited:
                     queue.append(neighbor)

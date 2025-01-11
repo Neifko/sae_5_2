@@ -267,8 +267,6 @@ class MainController:
             for i in range(len(path_to_target) - 1):
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
-                print(coords1, coords2)
-                print(self.arrow_ids)
 
                 # Vérifier que les coordonnées existent dans le dictionnaire
                 if (coords1, coords2) in self.arrow_ids:
@@ -604,7 +602,7 @@ class MainController:
                         center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
                         center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
                         arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
-                                                                                    center2_y, fill="grey",
+                                                                                    center2_y, fill="purple",
                                                                                     arrow=ctk.LAST, width=5)
                     # Modifier la couleur de la flèche en violet
                     self.main_view.main_frame.hex_canvas.itemconfig(arrow_id, fill="purple")
