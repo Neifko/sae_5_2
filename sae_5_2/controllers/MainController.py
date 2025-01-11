@@ -550,10 +550,7 @@ class MainController:
             visited_nodes.add(depart_coords)
 
         # Dessiner le chemin parcouru complet avec des flèches grises
-        for i in range(len(total_path) - 1):
-            coords1 = total_path[i]
-            coords2 = total_path[i + 1]
-
+        for coords1, coords2 in zip(total_path, total_path[1:]):
             # Vérifier que les coordonnées existent dans le dictionnaire
             if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
                 hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
