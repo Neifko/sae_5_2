@@ -5,39 +5,38 @@ class StableMaximumSetSolver:
         """Initialise le solveur avec une instance de Grid."""
         self.grid = grid
         self.max_set = []
-        self.current_set = []
 
-    def is_stable(self, node):
+    def is_stable(self, node, included_nodes):
         """Vérifie si le nœud peut être ajouté à l'ensemble courant sans violer la stabilité."""
         for neighbor in node.voisins.values():
-            if neighbor in self.current_set:
+            if neighbor in included_nodes:
                 return False
         return True
 
-    def backtrack(self, nodes):
-        """Fonction de backtracking pour explorer les nœuds."""
-        if not nodes:
-            if len(self.current_set) > len(self.max_set):
-                self.max_set = self.current_set[:]
-            return
+    def find_stableMax(self):
+        """Trouve un ensemble stable maximum dans la grille en utilisant la programmation dynamique."""
+        nodes = list(self.grid.nodes.values())
+        n = len(nodes)
 
-        # Prendre le premier nœud
-        node = nodes[0]
-        remaining_nodes = nodes[1:]
+        # Dictionnaire pour stocker les résultats des sous-problèmes
+        dp = [0] * (n + 1)
+        included = [set() for _ in range(n + 1)]
 
-        # Option 1: Ne pas inclure le nœud
-        self.backtrack(remaining_nodes)
+        for i in range(n):
+            node = nodes[i]
+            # Vérifier si le nœud peut être inclus
+            for j in range(i):
+                if self.is_stable(node, included[j]):
+                    if dp[j] + 1 > dp[i + 1]:
+                        dp[i + 1] = dp[j] + 1
+                        included[i + 1] = included[j].copy()
+                        included[i + 1].add(node)
 
-        # Option 2: Inclure le nœud si stable
-        if self.is_stable(node):
-            self.current_set.append(node)
-            self.backtrack(remaining_nodes)
-            self.current_set.pop()  # Retirer le nœud après exploration
+        # Trouver l'ensemble stable maximum
+        max_size = max(dp)
+        self.max_set = included[dp.index(max_size)]
+        return self.max_set
 
-    def find_stable_maximum_set(self):
-        """Trouve un ensemble stable maximum dans la grille."""
-        self.backtrack(list(self.grid.nodes.values()))
-        return self.max_set 
     
     
 def test_stable_maximum_set_solver():
