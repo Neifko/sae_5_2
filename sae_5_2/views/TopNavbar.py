@@ -40,6 +40,10 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
+            elif action == "Bellman-Ford":
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_bellman_ford)
+            elif action == "A*":
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_aetoile)
             elif action == "Stable maximum":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_stableMax)
             else:
@@ -72,6 +76,15 @@ class TopNavbar(ctk.CTkFrame):
     def call_profondeur(self):
         self.get_controller().call_profondeur()
 
+    def call_largeur(self):
+        self.get_controller().call_largeur()
+    
+    def call_bellman_ford(self):
+        self.get_controller().call_bellmanford()
+    
+    def call_aetoile(self):
+        self.get_controller().call_aetoile()
+
 
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette
@@ -83,8 +96,7 @@ class TopNavbar(ctk.CTkFrame):
             elif event.num == 5:
                 self.canvas.xview_scroll(1, "units")
 
-    def call_largeur(self):
-        self.get_controller().call_largeur()
+
 
     def call_stableMax(self):
         self.get_controller().call_stableMax()
