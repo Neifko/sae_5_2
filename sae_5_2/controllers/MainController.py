@@ -425,6 +425,9 @@ class MainController:
         for (hex_x, hex_y), hex_id in self.hexagons.items():
             if self.main_view.main_frame.hex_canvas.find_closest(x, y)[0] == hex_id:
                 if self.depart_mode:
+                    if (hex_x, hex_y) == self.objectif_hex:
+                        print("Vous ne pouvez pas placer la case de départ sur la case d'objectif.")
+                        return
                     if self.depart_hex:
                         # Réinitialiser l'ancienne case de départ
                         old_hex_x, old_hex_y = self.depart_hex
@@ -437,6 +440,9 @@ class MainController:
                     self.main_view.main_frame.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="pink")
                     self.depart_cube = self.axial_to_cube(hex_x, hex_y)  # Stocker les coordonnées cubiques
                 elif self.objectif_mode:
+                    if (hex_x, hex_y) == self.depart_hex:
+                        print("Vous ne pouvez pas placer la case d'objectif sur la case de départ.")
+                        return
                     if self.objectif_hex:
                         # Réinitialiser l'ancienne case d'objectif
                         old_hex_x, old_hex_y = self.objectif_hex
@@ -464,9 +470,10 @@ class MainController:
                             print("Node désactivé")
                         else:
                             node_modif.active = True
-                            print("Pas desactivé")
+                            print("Pas désactivé")
 
                 break
+
 
     def on_canvas_motion(self, event):
         if not self.depart_mode and not self.objectif_mode:
