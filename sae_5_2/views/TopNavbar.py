@@ -37,6 +37,9 @@ class TopNavbar(ctk.CTkFrame):
             elif action == "Aléatoire":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
+                button = ctk.CTkButton(self, text=action, command=self.call_profondeur)
+            elif action == "Dijkstra":
+                button = ctk.CTkButton(self, text=action, command=self.call_dijkstra)
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
@@ -69,6 +72,9 @@ class TopNavbar(ctk.CTkFrame):
 
     def call_profondeur(self):
         self.get_controller().call_profondeur()
+
+    def call_dijkstra(self):
+        self.get_controller().call_dijkstra()
 
 
     def on_mouse_wheel(self, event):
