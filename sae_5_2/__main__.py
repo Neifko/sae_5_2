@@ -1,12 +1,14 @@
 import random
 import customtkinter as ctk
 
+from sae_5_2.controllers.MainController import MainController
 from sae_5_2.models.Grid import Grid
 from sae_5_2.models.AEtoile import AEtoile
 from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
 from sae_5_2.models.Node import Node
 from sae_5_2.views.GUI import GUI
 from sae_5_2.controllers.InterfaceController import InterfaceController
+from sae_5_2.views.MainWindow import MainWindow
 
 
 def main():
@@ -64,9 +66,8 @@ if __name__ == "__main__":
     # hex_grid.display_grid()
 
     # LANCEMENT -----------------------------------------------------------
-    root = ctk.CTk()
-    controller = InterfaceController(rows, cols)
-    gui = GUI(root, controller, rows, cols)
-    controller.set_view(gui)
-    root.mainloop()
+    app_view = MainWindow()
+    app_controller = MainController(app_view)
+    app_view.set_controller(app_controller)
+    app_view.mainloop()
     # ---------------------------------------------------------------------
