@@ -1,4 +1,4 @@
-import Grid as Grid
+import sae_5_2.models.Grid as Grid
 
 class StableMaximumSetSolver:
     def __init__(self, grid):
@@ -71,4 +71,4 @@ def test_stable_maximum_set_solver():
         print("Test échoué: L'ensemble n'est pas stable.")
 
 # Appeler la fonction de tests
-test_stable_maximum_set_solver()
+#test_stable_maximum_set_solver()

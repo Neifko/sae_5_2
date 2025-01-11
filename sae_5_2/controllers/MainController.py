@@ -5,6 +5,7 @@ import customtkinter as ctk
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.models.Grid import Grid
+from sae_5_2.controllers.stableMaxController import stableMaxController
 
 
 class MainController:
@@ -612,3 +613,7 @@ class MainController:
                     # Ajouter un délai pour voir le chemin se dessiner progressivement
                     self.main_view.after(2)  # Définir le délai en millisecondes
                     self.main_view.update()
+
+
+    def call_stableMax(self):
+        pass
