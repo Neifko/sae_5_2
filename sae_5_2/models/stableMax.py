@@ -22,11 +22,16 @@ class StableMaximumSetSolver:
         dp = [0] * (n + 1)
         included = [set() for _ in range(n + 1)]
 
+        unvisited_neighbors = [
+                n for n in nodes
+                if not n.active
+            ]  # Liste des voisins non visités et actifs
+
         for i in range(n):
             node = nodes[i]
             # Vérifier si le nœud peut être inclus
             for j in range(i):
-                if self.is_stable(node, included[j]):
+                if self.is_stable(node, included[j]) and node not in unvisited_neighbors:
                     if dp[j] + 1 > dp[i + 1]:
                         dp[i + 1] = dp[j] + 1
                         included[i + 1] = included[j].copy()
