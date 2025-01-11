@@ -10,7 +10,7 @@ class LeftNavbar(ctk.CTkFrame):
 
         self.parent = parent
 
-        colors = ["Black", "White", "Blue", "Green", "Yellow", "Départ", "Objectif"]
+        colors = ["Black", "White", "Blue", "Green", "Yellow", "Départ", "Objectif", "Stable Maximum"]
 
         for color in colors:
             button = ctk.CTkButton(
@@ -126,3 +126,6 @@ class LeftNavbar(ctk.CTkFrame):
 
     def draw_max_grid(self):
         self.get_controller().draw_max_grid()
+
+    def call_stableMax(self):
+        self.get_controller().call_stableMax()

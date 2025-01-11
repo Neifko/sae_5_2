@@ -83,6 +83,7 @@ class TopNavbar(ctk.CTkFrame):
         self.get_controller().call_profondeur()
 
 
+
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette
         if event.delta:  # Pour Windows
