@@ -28,7 +28,7 @@ class TopNavbar(ctk.CTkFrame):
         self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
 
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur",
-                   "Bellman-Ford", "Dijkstra", "A*"]
+                   "Bellman-Ford", "Dijkstra", "A*", "Stable maximum"]
         for action in actions:
             if action == "Effacer Tout":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_canvas)
@@ -40,6 +40,8 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
+            elif action == "Stable maximum":
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_stableMax)
             else:
                 button = ctk.CTkButton(self.inner_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=tk.LEFT, padx=5, pady=5)
@@ -83,4 +85,7 @@ class TopNavbar(ctk.CTkFrame):
 
     def call_largeur(self):
         self.get_controller().call_largeur()
+
+    def call_stableMax(self):
+        self.get_controller().call_stableMax()
 
