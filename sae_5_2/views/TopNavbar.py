@@ -46,11 +46,11 @@ class TopNavbar(ctk.CTkFrame):
             elif action == "Aléatoire":
                 button.configure(command=self.random_case_colors)
             elif action == "Parcours en profondeur":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
+                button.configure(command=self.call_profondeur)
             elif action == "Parcours en largeur":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
+                button.configure(command=self.call_largeur)
             elif action == "Stable maximum":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_stableMax)
+                button.configure(command=self.call_stableMax)
             else:
                 button.configure(command=lambda a=action: print(a))
 
