@@ -1,13 +1,8 @@
 import random
-import customtkinter as ctk
 
 from sae_5_2.controllers.MainController import MainController
 from sae_5_2.models.Grid import Grid
 from sae_5_2.models.AEtoile import AEtoile
-from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
-from sae_5_2.models.Node import Node
-from sae_5_2.views.GUI import GUI
-from sae_5_2.controllers.InterfaceController import InterfaceController
 from sae_5_2.views.MainWindow import MainWindow
 
 
