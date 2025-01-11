@@ -40,7 +40,6 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self, text=action, command=self.call_profondeur)
             elif action == "Dijkstra":
                 button = ctk.CTkButton(self, text=action, command=self.call_dijkstra)
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
             else:
