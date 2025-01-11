@@ -1,6 +1,6 @@
 import unittest
 from sae_5_2.models.Grid import Grid
-from sae_5_2.models.algoBFS import AlgoBFS
+from sae_5_2.models.algoBFSV1 import AlgoBFS
 
 class TestBFS(unittest.TestCase):
     def test_bfs(self):
@@ -11,12 +11,12 @@ class TestBFS(unittest.TestCase):
         print("=== Test de l'algorithme BFS ===")
         
         # Création d'une grille hexagonale 5x5
-        grid = Grid(5, 5)  # Initialise une grille hexagonale de 5 lignes et 5 colonnes.
+        grid = Grid(3, 3)  # Initialise une grille hexagonale de 5 lignes et 5 colonnes.
         bfs = AlgoBFS(grid)  # Crée une instance de l'algorithme BFS avec cette grille.
 
         # Test 1 : Chemin simple entre deux nœuds
-        start = grid.get_node(0, 0, 0)  # Nœud de départ
-        goal = grid.get_node(2, 2, -4)  # Nœud d'arrivée
+        start = grid.get_node(0, 2, -2)  # Nœud de départ
+        goal = grid.get_node(2, 0, -2)  # Nœud d'arrivée
         path = bfs.find_path(start, goal)  # Recherche le chemin
         print("\nTest 1: Chemin simple")
         print("Chemin trouvé :", path)

@@ -3,7 +3,9 @@ import random
 import customtkinter as ctk
 
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
+from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.models.Grid import Grid
+from sae_5_2.controllers.stableMaxController import stableMaxController
 
 
 class MainController:
@@ -17,6 +19,8 @@ class MainController:
 
         ### A METTRE A JOUR ###
         self.profondeur_controller = ProfondeurController()
+        self.algoBFSController = algoBFSController()
+        self.stableMax = stableMaxController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -265,6 +269,8 @@ class MainController:
             for i in range(len(path_to_target) - 1):
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
+                print(coords1, coords2)
+                print(self.arrow_ids)
 
                 # Vérifier que les coordonnées existent dans le dictionnaire
                 if (coords1, coords2) in self.arrow_ids:
@@ -503,3 +509,122 @@ class MainController:
     def on_canvas_release(self, event):
         self.depart_mode = False
         self.objectif_mode = False
+
+
+    def call_largeur(self):
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+
+        self.algoBFSController.set_grid(self.grid)
+        path_to_target, total_path = self.algoBFSController.run_bfs(depart_cubique, arrive_cubique)
+
+        path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
+        total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
+
+        print(path)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_bfs_path(path, total_path)
+
+    def draw_bfs_path(self, path_to_target, total_path):
+        if not total_path:
+            return
+
+        # Dictionnaire pour stocker les identifiants des flèches grises
+        self.arrow_ids = {}
+
+        # Variable pour suivre les nœuds visités
+        visited_nodes = set()
+        if self.depart_hex:
+            depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+            visited_nodes.add(depart_coords)
+
+        # Dessiner le chemin parcouru complet avec des flèches grises
+        for coords1, coords2 in zip(total_path, total_path[1:]):
+            # Vérifier que les coordonnées existent dans le dictionnaire
+            if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+
+                # Obtenir les sommets des hexagones
+                points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
+                points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
+
+                if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                    # Calculer les centres des hexagones
+                    center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                    center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                    center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                    center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+
+                    # Vérifier si le nœud suivant a déjà été visité
+                    if coords2 not in visited_nodes:
+                        # Dessiner une flèche grise entre les deux centres
+                        arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
+                                                                                    center2_y, fill="grey",
+                                                                                    arrow=ctk.LAST, width=5)
+                        self.arrow_ids[(coords1, coords2)] = arrow_id
+
+                        # Ajouter un délai pour voir le chemin se dessiner progressivement
+                        self.main_view.after(5)  # Définir le délai en millisecondes
+                        self.main_view.update()
+
+                    # Ajouter le nœud suivant à l'ensemble des nœuds visités
+                    visited_nodes.add(coords2)
+
+        # Modifier la couleur des flèches existantes en violet pour le chemin vers la cible
+        if path_to_target:
+            print("Chemin", path_to_target)
+            for i in range(len(path_to_target) - 1):
+                coords1 = path_to_target[i]
+                coords2 = path_to_target[i + 1]
+
+                # Vérifier que les coordonnées existent dans le dictionnaire
+                if (coords1, coords2):
+                    hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                    hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+
+                # Obtenir les sommets des hexagones
+                    points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
+                    points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
+                    if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                        # Calculer les centres des hexagones
+                        center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                        center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                        center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                        center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+                        arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
+                                                                                    center2_y, fill="grey",
+                                                                                    arrow=ctk.LAST, width=5)
+                    # Modifier la couleur de la flèche en violet
+                    self.main_view.main_frame.hex_canvas.itemconfig(arrow_id, fill="purple")
+
+                    # Ajouter un délai pour voir le chemin se dessiner progressivement
+                    self.main_view.after(2)  # Définir le délai en millisecondes
+                    self.main_view.update()
+
+
+    def call_stableMax(self):
+        self.stableMax.set_grid(self.grid)
+        stableMax = self.stableMax.run_stableMax()
+        for noeud in stableMax:
+            hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="red")

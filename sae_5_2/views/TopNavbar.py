@@ -38,6 +38,8 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
+            elif action == "Parcours en largeur":
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
             else:
                 button = ctk.CTkButton(self.inner_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=tk.LEFT, padx=5, pady=5)
@@ -68,6 +70,7 @@ class TopNavbar(ctk.CTkFrame):
     def call_profondeur(self):
         self.get_controller().call_profondeur()
 
+
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette
         if event.delta:  # Pour Windows
@@ -77,3 +80,7 @@ class TopNavbar(ctk.CTkFrame):
                 self.canvas.xview_scroll(-1, "units")
             elif event.num == 5:
                 self.canvas.xview_scroll(1, "units")
+
+    def call_largeur(self):
+        self.get_controller().call_largeur()
+
