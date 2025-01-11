@@ -5,7 +5,7 @@ class BF:
     """
     Classe BF.py (Bellman-Ford) : Implementation de l'algorithme Bellman-Ford 
     """
-    def __init__(self, grid: Grid):
+    def __init__(self, grid:Grid):
         """
         Constructeur de la classe BF qui prend en paramètre une grille de noeuds.
         """
@@ -14,7 +14,8 @@ class BF:
         self.parent = {}  # Dictionnaire pour suivre les noeuds parents
         self.total_path = []  # Liste pour suivre le chemin total parcouru
 
-    def bellman_ford(self, start_coords: tuple):
+
+    def bellman_ford(self, start_coords:tuple):
         """
         Algorithme de Bellman-Ford pour trouver les plus courts chemins depuis un noeud de départ.
         """
@@ -82,3 +83,4 @@ class BF:
         """
         path_to_target, total_path = self.find_shortest_path(start_coords, goal_coords)
         return path_to_target, path_to_target
+

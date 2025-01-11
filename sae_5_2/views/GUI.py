@@ -1,13 +1,18 @@
-import customtkinter as ctk
 import math
 import random
 import tkinter as tk
+import customtkinter as ctk
+
 from tkinter import Canvas
+
+from sae_5_2.models.Grid import Grid 
+from sae_5_2.views.LeftNavbar import LeftNavbar
+
 from sae_5_2.controllers.InterfaceController import InterfaceController
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.controllers.AEtoileController import AEtoileController
 from sae_5_2.controllers.BellmanFordController import BellmanFordController
-from sae_5_2.models.Grid import Grid  # Assurez-vous que cette importation est correcte
+from sae_5_2.controllers.algoBFSController import algoBFSController
 
 class GUI:
     def __init__(self, root, controller, rows, cols):
@@ -21,6 +26,7 @@ class GUI:
         self.profondeur_controller = ProfondeurController()
         self.a_etoile_controller = AEtoileController()
         self.bellman_ford_controller = BellmanFordController()
+        self.algoBFSController = algoBFSController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -101,6 +107,8 @@ class GUI:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_BellmanFord)
             elif action == "A*":
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_Aetoile)
+            elif action == "Parcours en largeur":
+                button = ctk.CTkButton(self.action_buttons_frame, text=action, command=self.call_largeur)
             else:
                 button = ctk.CTkButton(self.action_buttons_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=ctk.LEFT, padx=5, pady=5)
@@ -184,6 +192,7 @@ class GUI:
 
         print(f"Coordonnées cubiques de départ: {depart_cubique}")
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+
         self.a_etoile_controller.set_grid(self.controller.grid)
         path_to_target, total_path = self.a_etoile_controller.execute(depart_cubique, arrive_cubique)
 
@@ -215,12 +224,47 @@ class GUI:
 
         print(f"Coordonnées cubiques de départ: {depart_cubique}")
         print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+        
         self.bellman_ford_controller.set_grid(self.controller.grid)
         path_to_target, total_path = self.bellman_ford_controller.execute(depart_cubique, arrive_cubique)
 
         if path_to_target:
             print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
             print(f"Chemin vers la cible : {path_to_target}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+
+        # Dessiner les chemins
+        self.draw_path(path_to_target, total_path)
+
+    def call_largeur(self):
+        print("oui")
+      
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+        
+        self.algoBFSController.set_grid(self.controller.grid)
+        path_to_target, total_path = self.algoBFSController.run_bfs(depart_cubique, arrive_cubique)
+
+        path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
+        total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
+
+        # print(path)
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path}")
         else:
             print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
 
@@ -318,9 +362,12 @@ class GUI:
             for i in range(len(path_to_target) - 1):
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
+                print(coords1, coords2)
+                print(self.arrow_ids)
 
                 # Vérifier que les coordonnées existent dans le dictionnaire
                 if (coords1, coords2) in self.arrow_ids:
+                    print("oui")
                     arrow_id = self.arrow_ids[(coords1, coords2)]
                     # Modifier la couleur de la flèche en violet
                     self.hex_canvas.itemconfig(arrow_id, fill="purple")
@@ -507,6 +554,7 @@ class GUI:
                             node_modif.active = False
                             print("Node désactivé")
                         else:
+                            node_modif.active = True
                             print("Pas desactivé")
                             node_modif.active = True
 
@@ -531,6 +579,7 @@ class GUI:
                             node_modif.active = False
                             print("Node désactivé")
                         else:
+                            node_modif.active = True
                             print("Pas désactivé")
                             node_modif.active = True
                     break
@@ -538,3 +587,5 @@ class GUI:
     def on_canvas_release(self, event):
         self.depart_mode = False
         self.objectif_mode = False
+
+

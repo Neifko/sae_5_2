@@ -21,8 +21,8 @@ class ProfondeurController:
         parcours_profondeur = ParcoursProfondeur(hex_grid)
 
         # Définir le point de départ et d'arrivée
-        start_coords = (0, 0, 0)
-        target_coords = (2,1,-3)
+        start_coords = (0, 2, -2)
+        target_coords = (2,-1,-1)
 
         # hex_grid.display_neighbors(*start_coords)
         # hex_grid.display_neighbors(*target_coords)
@@ -37,8 +37,10 @@ class ProfondeurController:
         else:
             print(f"Aucun chemin trouvé entre {start_coords} et {target_coords}.")
 
+
         print(f"Chemin total parcouru : {total_path}")
 
     def execute(self, start_coords, target_coords):
         path_to_target, total_path = self.parcours_profondeur.parcours(start_coords, target_coords)
         return path_to_target, total_path
+

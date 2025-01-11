@@ -4,10 +4,11 @@ import customtkinter as ctk
 
 from sae_5_2.models.Grid import Grid
 
-
 from sae_5_2.controllers.ProfondeurController import ProfondeurController
 from sae_5_2.controllers.BellmanFordController import BellmanFordController
 from sae_5_2.controllers.AEtoileController  import AEtoileController
+from sae_5_2.controllers.algoBFSController import algoBFSController
+from sae_5_2.controllers.stableMaxController import stableMaxController
 
 
 class MainController:
@@ -23,6 +24,8 @@ class MainController:
         self.profondeur_controller = ProfondeurController()
         self.aetoile_controller = AEtoileController()
         self.bellman_ford_controller = BellmanFordController()
+        self.algoBFSController = algoBFSController()
+        self.stableMax = stableMaxController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -183,8 +186,6 @@ class MainController:
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
 
-
-    
 
     def random_case_colors(self):
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
