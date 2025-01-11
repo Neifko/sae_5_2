@@ -43,7 +43,7 @@ class StableMaximumSetSolver:
 def test_stable_maximum_set_solver():
     """Fonction de tests pour StableMaximumSetSolver."""
     # Créer une grille de test
-    grid = Grid.Grid(rows=10, cols=10)  # Exemple d'une petite grille 3x3
+    grid = Grid.Grid(rows=3, cols=3)  # Exemple d'une petite grille 3x3
 
     # Créer un solveur pour l'ensemble stable maximum
     solver = StableMaximumSetSolver(grid)
@@ -71,4 +71,4 @@ def test_stable_maximum_set_solver():
         print("Test échoué: L'ensemble n'est pas stable.")
 
 # Appeler la fonction de tests
-#test_stable_maximum_set_solver()
+# test_stable_maximum_set_solver()

@@ -14,4 +14,4 @@ class stableMaxController:
     def run_stableMax(self):
         if self.grid is None:
             raise ValueError("Grid is not set.")
-        return self.stableMax.find_stable_maximum_set(self)
+        return self.stableMax.find_stable_maximum_set()

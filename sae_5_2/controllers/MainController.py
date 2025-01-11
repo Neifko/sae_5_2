@@ -20,6 +20,7 @@ class MainController:
         ### A METTRE A JOUR ###
         self.profondeur_controller = ProfondeurController()
         self.algoBFSController = algoBFSController()
+        self.stableMax = stableMaxController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -504,7 +505,6 @@ class MainController:
 
 
     def call_largeur(self):
-        print("oui")
         if self.path_drawn:
             self.clear_results()
 
@@ -616,4 +616,8 @@ class MainController:
 
 
     def call_stableMax(self):
-        pass
+        self.stableMax.set_grid(self.grid)
+        stableMax = self.stableMax.run_stableMax()
+        for noeud in stableMax:
+            hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="red")
