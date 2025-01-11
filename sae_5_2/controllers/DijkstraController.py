@@ -40,5 +40,5 @@ class DijkstraController:
         print(f"Chemin total parcouru : {total_path}")
 
     def execute(self, start_coords, target_coords):
-        best_path = self.dijkstra.shortest_path(start_coords, target_coords)
-        return best_path
+        best_path, all_path = self.dijkstra.shortest_path(start_coords, target_coords)
+        return best_path, all_path

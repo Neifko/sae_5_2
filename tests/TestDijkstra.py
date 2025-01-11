@@ -12,10 +12,7 @@ class TestDijkstra(unittest.TestCase):
         self.dijkstra = Dijkstra(self.grid)
 
     def test_shortest_path_adjacent(self):
-        self.grid.get_node(2, -1, -1).valeur = 2
-        self.grid.get_node(2, -0, -2).valeur = 2
-        self.grid.get_node(1, 1, -2).active = False
-        self.grid.get_node(2, -1, -1).active = False
+        self.grid.get_node(2, -1, -1).valeur = 5
         self.grid.get_node(2, -0, -2).active = False
 
         best_chemin = self.dijkstra.shortest_path((4, -2, -2),
