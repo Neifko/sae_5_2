@@ -30,12 +30,21 @@ class TopNavbar(ctk.CTkFrame):
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur",
                    "Bellman-Ford", "Dijkstra", "A*", "Stable maximum"]
         for action in actions:
+            button = ctk.CTkButton(self.inner_frame,
+                                   text=action,
+                                   corner_radius=32,
+                                   fg_color="transparent",
+                                   hover_color="#5A1E9C",
+                                   border_width=2,
+                                   border_spacing=5,
+                                   border_color="#431677")
+
             if action == "Effacer Tout":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_canvas)
+                button.configure(command=self.clear_canvas)
             elif action == "Effacer Résultats":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_results)
+                button.configure(command=self.clear_results)
             elif action == "Aléatoire":
-                button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
+                button.configure(command=self.random_case_colors)
             elif action == "Parcours en profondeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Parcours en largeur":
@@ -43,7 +52,8 @@ class TopNavbar(ctk.CTkFrame):
             elif action == "Stable maximum":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_stableMax)
             else:
-                button = ctk.CTkButton(self.inner_frame, text=action, command=lambda a=action: print(a))
+                button.configure(command=lambda a=action: print(a))
+
             button.pack(side=tk.LEFT, padx=5, pady=5)
 
         # Mettre à jour la zone de défilement après avoir ajouté les boutons
