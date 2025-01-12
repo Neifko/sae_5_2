@@ -16,4 +16,4 @@ class Node:
         self.active = True          # Indicateur pour dire si le noeud est un obstacle ou non (si False, il s'agit d'un obstacle)
 
     def __repr__(self):
-        return f"({self.x}, {self.y}, {self.z})"
+        return f"Node({self.x}, {self.y}, {self.z})"
