@@ -13,6 +13,9 @@ from sae_5_2.controllers.stableMaxController import stableMaxController
 
 class MainController:
     def __init__(self, view):
+        '''
+        Initialise le contrôleur principal avec la vue passée en paramètre
+        '''
         self.main_view = view
         self.rows = 10
         self.cols = 10
@@ -68,10 +71,20 @@ class MainController:
         self.pathfinding_in_progress = False
         self.stop_drawing = False  # Variable pour arrêter le dessin
 
+
+    ########################################## Fonctions pour la grille#################################################
+    ####################################################################################################################
+    
     def generate_grid(self, rows, cols):
+        '''
+        Génère une grille de taille rows x cols
+        '''
         return Grid(rows, cols)
 
     def draw_hex_grid(self, rows, cols, size):
+        '''
+        Dessine une grille d'hexagones de taille spécifiée 
+        '''
         font_size = max(8, int(size * 0.4))
         font = ("Arial", font_size)
 
@@ -105,7 +118,62 @@ class MainController:
         for (x, y, z), (px, py) in positions.items():
             self.draw_hexagon(px, py, size, "white", (x, y, z))
 
+    def draw_grid(self):
+        '''
+        Dessine la grille avec les nouvelles dimensions spécifiées dans les champs de saisie
+        '''
+        self.clear_hexagons()
+        rows = int(self.main_view.left_frame.rows_entry.get())
+        cols = int(self.main_view.left_frame.cols_entry.get())
+
+        # Recréer la grille avec les nouvelles dimensions
+        self.grid = Grid(rows, cols)
+        self.draw_hex_grid(rows, cols, self.hex_size)
+
+        # Restaurer les cases de départ et d'objectif
+        self.restore_special_hexagons()
+
+    def draw_max_grid(self):
+        '''
+        Dessine la grille maximale qui peut tenir dans la zone de dessin en focntion de la taille des hexagones et la taille de la fenetre
+        '''
+        self.clear_hexagons()
+        canvas_width = self.main_view.main_frame.hex_canvas.winfo_width()
+        canvas_height = self.main_view.main_frame.hex_canvas.winfo_height()
+
+        # Calcul du nombre maximum de colonnes et de rangées qui peuvent tenir dans la zone de dessin
+        cols = int(canvas_width / (1.5 * self.hex_size))
+        rows = int(canvas_height / (math.sqrt(3) * self.hex_size))
+
+        # Mettre à jour les champs de saisie
+        self.main_view.left_frame.rows_entry.delete(0, 'end')
+        self.main_view.left_frame.rows_entry.insert(0, str(rows))
+        self.main_view.left_frame.cols_entry.delete(0, 'end')
+        self.main_view.left_frame.cols_entry.insert(0, str(cols))
+
+        # Recréer la grille avec les nouvelles dimensions
+        self.grid = Grid(rows, cols)
+        self.draw_hex_grid(rows, cols, self.hex_size)
+
+        # Restaurer les cases de départ et d'objectif
+        self.restore_special_hexagons()
+    
+    def update_hex_size(self, size):
+        '''
+        Met à jour la taille des hexagones et redessine la grille
+        '''
+        self.hex_size = int(size)
+        if self.grid:
+            self.clear_hexagons()
+            self.draw_hex_grid(self.grid.rows, self.grid.cols,
+                               self.hex_size)
+            # Restaurer les cases de départ et d'objectif
+            self.restore_special_hexagons()
+
     def get_direction_offset(self, direction, size):
+        '''
+        Calcule le décalage en fonction de la direction et de la taille des hexagones
+        '''
         if direction == "N":
             return (0, -math.sqrt(3) * size)
         elif direction == "NE":
@@ -122,16 +190,30 @@ class MainController:
             return (0, 0)
 
     def clear_grid(self):
+        '''
+        Réinitialise la grille en supprimant tous les hexagones
+        '''
         self.grid = Grid(0, 0)  # Réinitialiser la grille
 
     def axial_to_cube(self, q, r):
+        '''
+        Convertit les coordonnées axiales en coordonnées cubiques
+        '''
         x = q
         z = r
         y = -x - z
         return (x, y, z)
+    ####################################################################################################################
+    ####################################################################################################################
 
+    
+    ############################ fonctions pour les algorithmes ########################################################
+    ####################################################################################################################
     def call_profondeur(self):
-        
+        '''
+        Exécute l'algorithme de recherche en profondeur (Depth-First Search, DFS).
+        Cet algorithme explore aussi loin que possible le long de chaque branche avant de revenir en arrière.
+        '''
         if self.path_drawn:
             self.stop_drawing = False
             self.clear_results()
@@ -139,8 +221,8 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
-        
-        # pour mettre à jour l'interface avec les bons resultats des variables
+
+        # pour mettre à jour l'interface avec les bons résultats des variables
         self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
@@ -164,6 +246,10 @@ class MainController:
         self.draw_path_with_circles(path_to_target, total_path)
 
     def call_dijkstra(self):
+        '''
+        Exécute l'algorithme de Dijkstra.
+        Cet algorithme trouve le chemin le plus court entre les nœuds dans un graphe, ce qui peut représenter, par exemple, les routes.
+        '''
         if self.path_drawn:
             self.clear_results()
 
@@ -196,7 +282,8 @@ class MainController:
 
     def call_aetoile(self):
         """
-        Fonction d'écoute pour le bouton A*.
+        Exécute l'algorithme A* (A-star).
+        Cet algorithme trouve le chemin le plus court en utilisant une heuristique pour estimer le coût du chemin le plus court.
         """
         if self.path_drawn:
             self.clear_results()
@@ -204,7 +291,7 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
-        
+
         self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
@@ -230,7 +317,8 @@ class MainController:
 
     def call_bellmanford(self):
         """
-        Fonction d'écoute pour le bouton Bellman-Ford.
+        Exécute l'algorithme de Bellman-Ford.
+        Cet algorithme trouve le chemin le plus court à partir d'un nœud source vers tous les autres nœuds dans un graphe pondéré.
         """
         if self.path_drawn:
             self.clear_results()
@@ -238,7 +326,7 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
-        
+
         self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
@@ -262,7 +350,105 @@ class MainController:
         # Dessiner les chemins
         self.draw_path_with_circles(path_to_target, total_path)
 
+    def call_largeur(self):
+        '''
+        Exécute l'algorithme de parcours en largeur (Breadth-First Search, BFS).
+        Cet algorithme explore tous les nœuds voisins à la profondeur présente avant de passer à la profondeur suivante.
+        '''
+        if self.path_drawn:
+            self.clear_results()
+
+        if not self.depart_hex or not self.objectif_hex:
+            print("Veuillez définir une case de départ et une case d'objectif.")
+            return
+
+        self.reset_interface_state()
+
+        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
+
+        print(f"Coordonnées cubiques de départ: {depart_cubique}")
+        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
+
+        self.algoBFSController.set_grid(self.grid)
+        path_to_target, total_path = self.algoBFSController.run_bfs(depart_cubique, arrive_cubique)
+
+        path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
+        total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
+
+        if path_to_target:
+            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
+            print(f"Chemin vers la cible : {path}")
+        else:
+            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
+
+        print(f"Chemin total parcouru : {total_path}")
+        total_path = [total_path]
+
+        # Dessiner les chemins
+        self.draw_path_with_circles(path, total_path)
+
+    def call_stableMax(self):
+        '''
+        Exécute l'algorithme de stabilité maximale.
+        Cet algorithme identifie les nœuds les plus stables dans un graphe, souvent utilisé pour détecter les points critiques ou les centres de clusters.
+        '''
+        if self.path_drawn:
+            self.clear_results()
+
+        # self.reset_interface_state()
+
+        self.stableMax.set_grid(self.grid)
+        stableMax = self.stableMax.run_stableMax()
+        for noeud in stableMax:
+            hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="orange")
+            self.liste_stable.append(hex_id)
+
+
+    ####################################################################################################################
+    ####################################################################################################################
+
+    ###################################### Fonctions pour les cases et le dessin #######################################
+    ####################################################################################################################
+
+    def set_depart(self):
+        '''
+        Active le mode de sélection de la case de départ
+        '''
+        self.depart_mode = True
+        self.objectif_mode = False
+        print("Mode Départ activé")
+
+    def set_objectif(self):
+        '''
+        Active le mode de sélection de la case d'objectif
+        '''
+        self.objectif_mode = True
+        self.depart_mode = False
+        print("Mode Objectif activé")
+
+    def set_color(self, color):
+        '''
+        Définit la couleur actuelle
+        '''
+        self.current_color = color
+        self.depart_mode = False
+        self.objectif_mode = False
+        print(f"Color set to {color}")
+
+    def get_canvas_center(self):
+        '''
+        Obtient le centre du canvas
+        '''
+        canvas_width = self.main_view.main_frame.hex_canvas.winfo_width()
+        canvas_height = self.main_view.main_frame.hex_canvas.winfo_height()
+        return canvas_width / 2, canvas_height / 2
+
     def random_case_colors(self):
+        '''
+        Attribue des couleurs aléatoires à tous les hexagones de la grille actuelle
+        '''
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
         for (hex_x, hex_y), hex_id in self.hexagons.items():
             # Ne pas changer la couleur des cases de départ et d'objectif
@@ -290,28 +476,10 @@ class MainController:
             # Mettre à jour la valeur en fonction de la couleur
             self.update_node_value(node_modif, color)
 
-    def set_depart(self):
-        self.depart_mode = True
-        self.objectif_mode = False
-        print("Mode Départ activé")
-
-    def set_objectif(self):
-        self.objectif_mode = True
-        self.depart_mode = False
-        print("Mode Objectif activé")
-
-    def set_color(self, color):
-        self.current_color = color
-        self.depart_mode = False
-        self.objectif_mode = False
-        print(f"Color set to {color}")
-
-    def get_canvas_center(self):
-        canvas_width = self.main_view.main_frame.hex_canvas.winfo_width()
-        canvas_height = self.main_view.main_frame.hex_canvas.winfo_height()
-        return canvas_width / 2, canvas_height / 2
-
     def draw_hexagon(self, x, y, size, color, coord=None, font_size=12):
+        '''
+        Dessine un hexagone à la position spécifiée
+        '''
         points = []
 
         for i in range(6):
@@ -338,130 +506,10 @@ class MainController:
             # TODO : verifier
             self.main_view.main_frame.hex_canvas.create_text(x, y, text=label, fill="black", font=("Arial", font_size))
 
-    def clear_canvas(self):
-        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
-        self.stop_drawing = True  # Arrêter le dessin
-        self.reset_hexagon_colors()
-        self.clear_results()
-        self.reactivate_all_nodes()
-        self.depart_hex = None
-        self.objectif_hex = None
-        self.path_drawn = False
-
-    def reactivate_all_nodes(self):
-        if self is not None:
-            grid = self.grid
-            for node in grid.nodes.values():
-                node.active = True
-                node.valeur = 1
-
-    def reset_interface_state(self):
-        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
-        self.stop_drawing = False  # Arrêter le dessin
-        self.path_drawn = False  # Réinitialiser l'état du chemin dessiné
-        self.main_view.update_idletasks()
-
-    def clear_results(self):
-        self.stop_drawing = True  # Arrêter le dessin
-        # Effacer tous les résultats stockés dans la liste
-        for result in self.results:
-            self.main_view.main_frame.hex_canvas.delete(result)
-
-        for hex_id in self.liste_stable:
-            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
-            node = self.grid.get_node(*self.hex_id_get_coords[hex_id])
-            node.active = True
-            node.valeur = 1
-        self.liste_stable.clear()
-
-        self.results.clear()
-
-        # Réinitialiser les dictionnaires de flèches et de cercles
-        self.arrow_ids.clear()
-        self.circle_ids.clear()
-
-        # Réinitialiser les variables de suivi des chemins
-        self.path_drawn = False
-
-
-    def reset_hexagon_colors(self):
-        for (hex_x, hex_y), hex_id in self.hexagons.items():
-            # TODO : verifier
-            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
-
-        # Clear circles
-        for circle_id in self.circle_ids.values():
-            self.main_view.main_frame.hex_canvas.delete(circle_id)
-        self.circle_ids.clear()
-
-    def clear_hexagons(self):
-        self.main_view.main_frame.hex_canvas.delete("all")
-        self.hexagons.clear()
-        self.hex_id_get_coords.clear()
-        self.depart_hex = None
-        self.objectif_hex = None
-
-    def draw_grid(self):
-        self.clear_hexagons()
-        rows = int(self.main_view.left_frame.rows_entry.get())
-        cols = int(self.main_view.left_frame.cols_entry.get())
-
-        # Recréer la grille avec les nouvelles dimensions
-        self.grid = Grid(rows, cols)
-        self.draw_hex_grid(rows, cols, self.hex_size)
-
-        # Restaurer les cases de départ et d'objectif
-        self.restore_special_hexagons()
-
-    def draw_max_grid(self):
-        self.clear_hexagons()
-        canvas_width = self.main_view.main_frame.hex_canvas.winfo_width()
-        canvas_height = self.main_view.main_frame.hex_canvas.winfo_height()
-
-        # Calcul du nombre maximum de colonnes et de rangées qui peuvent tenir dans la zone de dessin
-        cols = int(canvas_width / (1.5 * self.hex_size))
-        rows = int(canvas_height / (math.sqrt(3) * self.hex_size))
-
-        # Mettre à jour les champs de saisie
-        self.main_view.left_frame.rows_entry.delete(0, 'end')
-        self.main_view.left_frame.rows_entry.insert(0, str(rows))
-        self.main_view.left_frame.cols_entry.delete(0, 'end')
-        self.main_view.left_frame.cols_entry.insert(0, str(cols))
-
-        # Recréer la grille avec les nouvelles dimensions
-        self.grid = Grid(rows, cols)
-        self.draw_hex_grid(rows, cols, self.hex_size)
-
-        # Restaurer les cases de départ et d'objectif
-        self.restore_special_hexagons()
-
-    def toggle_coords(self):
-        if self.grid:
-            self.clear_hexagons()
-            self.draw_hex_grid(self.grid.rows, self.grid.cols,
-                               self.hex_size)
-            # Restaurer les cases de départ et d'objectif
-            self.restore_special_hexagons()
-
-    def update_hex_size(self, size):
-        self.hex_size = int(size)
-        if self.grid:
-            self.clear_hexagons()
-            self.draw_hex_grid(self.grid.rows, self.grid.cols,
-                               self.hex_size)
-            # Restaurer les cases de départ et d'objectif
-            self.restore_special_hexagons()
-
-    def restore_special_hexagons(self):
-        # TODO : verifier graphique
-        if self.depart_hex:
-            hex_x, hex_y = self.depart_hex
-            self.main_view.main_frame.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="pink")
-        if self.objectif_hex:
-            hex_x, hex_y = self.objectif_hex
-            self.main_view.main_frame.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="red")
-
     def on_canvas_click(self, event):
+        '''
+        Gère les événements de clic sur le canvas
+        '''
         x, y = event.x, event.y
         # Vérifier si un hexagone est cliqué
         for (hex_x, hex_y), hex_id in self.hexagons.items():
@@ -519,17 +567,10 @@ class MainController:
 
                 break
 
-    def update_node_value(self, node, color):
-        if color == "Blue":
-            node.valeur = 5
-        elif color == "Green":
-            node.valeur = 3
-        elif color == "Yellow":
-            node.valeur = 2
-        else:
-            node.valeur = 1  # Valeur par défaut pour les autres couleurs
-
     def on_canvas_motion(self, event):
+        '''
+        Gère les événements de mouvement de la souris sur le canvas, pour dessiner des lignes en restant appuyé sur le clic gauche
+        '''
         if not self.depart_mode and not self.objectif_mode:
             x, y = event.x, event.y
             # Vérifier si un hexagone est cliqué
@@ -554,58 +595,10 @@ class MainController:
                         self.update_node_value(node_modif, self.current_color)
                     break
 
-    def on_canvas_release(self, event):
-        self.depart_mode = False
-        self.objectif_mode = False
-
-    def call_largeur(self):
-        if self.path_drawn:
-            self.clear_results()
-
-        if not self.depart_hex or not self.objectif_hex:
-            print("Veuillez définir une case de départ et une case d'objectif.")
-            return
-        
-        self.reset_interface_state()
-
-        depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
-        arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
-
-        print(f"Coordonnées cubiques de départ: {depart_cubique}")
-        print(f"Coordonnées cubiques d'objectif: {arrive_cubique}")
-
-        self.algoBFSController.set_grid(self.grid)
-        path_to_target, total_path = self.algoBFSController.run_bfs(depart_cubique, arrive_cubique)
-
-        path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
-        total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
-
-        if path_to_target:
-            print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
-            print(f"Chemin vers la cible : {path}")
-        else:
-            print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
-
-        print(f"Chemin total parcouru : {total_path}")
-        total_path = [total_path]
-
-        # Dessiner les chemins
-        self.draw_path_with_circles(path, total_path)
-
-    def call_stableMax(self):
-        if self.path_drawn:
-            self.clear_results()
-
-        # self.reset_interface_state()
-
-        self.stableMax.set_grid(self.grid)
-        stableMax = self.stableMax.run_stableMax()
-        for noeud in stableMax:
-            hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
-            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="orange")
-            self.liste_stable.append(hex_id)
-
     def draw_path_with_circles(self, path_to_target, total_path):
+        '''
+        Dessine le chemin avec des cercles et des flèches en fonction de la liste proposé par l'algorithme de recherche
+        '''
         if not total_path:
             return
 
@@ -697,3 +690,146 @@ class MainController:
         # Forcer la mise à jour de l'interface après avoir dessiné le chemin
         self.main_view.update_idletasks()
 
+    ####################################################################################################################
+    ####################################################################################################################
+
+    ################################# Fonctions pour reinitialisation et nettoyage #####################################
+    ####################################################################################################################
+
+    def clear_canvas(self):
+        '''
+        Réinitialise le canvas et les variables associées pour effacer les hexagones et les résultats
+        '''
+        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
+        self.stop_drawing = True  # Arrêter le dessin
+        self.reset_hexagon_colors()
+        self.clear_results()
+        self.reactivate_all_nodes()
+        self.depart_hex = None
+        self.objectif_hex = None
+        self.path_drawn = False
+
+    def reactivate_all_nodes(self):
+        '''
+        Réactive tous les nœuds de la grille en remettant leur valeur à 1
+        '''
+        if self is not None:
+            grid = self.grid
+            for node in grid.nodes.values():
+                node.active = True
+                node.valeur = 1
+
+    def reset_interface_state(self):
+        '''
+        Réinitialise l'état de l'interface
+        '''
+        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
+        self.stop_drawing = False  # Arrêter le dessin
+        self.path_drawn = False  # Réinitialiser l'état du chemin dessiné
+        self.main_view.update_idletasks()
+
+    def clear_results(self):
+        '''
+        Efface tous les résultats affichés sur le canvas (cercles et flèches) sans supprimer les cases
+        '''
+        self.stop_drawing = True  # Arrêter le dessin
+        # Effacer tous les résultats stockés dans la liste
+        for result in self.results:
+            self.main_view.main_frame.hex_canvas.delete(result)
+
+        for hex_id in self.liste_stable:
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
+            node = self.grid.get_node(*self.hex_id_get_coords[hex_id])
+            node.active = True
+            node.valeur = 1
+        self.liste_stable.clear()
+
+        self.results.clear()
+
+        # Réinitialiser les dictionnaires de flèches et de cercles
+        self.arrow_ids.clear()
+        self.circle_ids.clear()
+
+        # Réinitialiser les variables de suivi des chemins
+        self.path_drawn = False
+
+
+    def reset_hexagon_colors(self):
+        '''
+        Réinitialise les couleurs des hexagones
+        '''
+        for (hex_x, hex_y), hex_id in self.hexagons.items():
+            # TODO : verifier
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
+
+        # Clear circles
+        for circle_id in self.circle_ids.values():
+            self.main_view.main_frame.hex_canvas.delete(circle_id)
+        self.circle_ids.clear()
+
+    def clear_hexagons(self):
+        '''
+        Efface tous les hexagones dessinés sur le canvas
+        '''
+        self.main_view.main_frame.hex_canvas.delete("all")
+        self.hexagons.clear()
+        self.hex_id_get_coords.clear()
+        self.depart_hex = None
+        self.objectif_hex = None
+
+    def restore_special_hexagons(self):
+        '''
+        Restaure les hexagones de départ et d'objectif
+        '''
+        # TODO : verifier graphique
+        if self.depart_hex:
+            hex_x, hex_y = self.depart_hex
+            self.main_view.main_frame.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="pink")
+        if self.objectif_hex:
+            hex_x, hex_y = self.objectif_hex
+            self.main_view.main_frame.hex_canvas.itemconfig(self.hexagons[(hex_x, hex_y)], fill="red")
+
+    def on_canvas_release(self, event):
+        '''
+        Gère les événements de relâchement de la souris sur le canvas
+        '''
+        self.depart_mode = False
+        self.objectif_mode = False
+
+
+    ####################################################################################################################
+    ####################################################################################################################
+
+    ############################################### Autres Fonctions ###################################################
+    ####################################################################################################################
+
+    def toggle_coords(self):
+        '''
+        Bascule l'affichage des coordonnées sur les hexagones
+        '''
+        if self.grid:
+            self.clear_hexagons()
+            self.draw_hex_grid(self.grid.rows, self.grid.cols,
+                               self.hex_size)
+            # Restaurer les cases de départ et d'objectif
+            self.restore_special_hexagons()
+
+    def update_node_value(self, node, color):
+        '''
+        Met à jour la valeur d'un nœud en fonction de sa couleur
+        '''
+        if color == "Blue":
+            node.valeur = 5
+        elif color == "Green":
+            node.valeur = 3
+        elif color == "Yellow":
+            node.valeur = 2
+        else:
+            node.valeur = 1  # Valeur par défaut pour les autres couleurs
+
+    
+
+    
+
+
+    
