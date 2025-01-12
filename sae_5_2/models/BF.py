@@ -7,29 +7,26 @@ class BF:
     """
     def __init__(self, grid:Grid):
         """
-        Constructeur de la classe BF qui prend en paramètre une grille de noeuds.
+        Constructeur de la classe BellmanFord qui prend en paramètre une grille de noeuds.
         """
         self.grid = grid
         self.visited = set()  # Ensemble pour suivre les noeuds visités
         self.parent = {}  # Dictionnaire pour suivre les noeuds parents
         self.total_path = []  # Liste pour suivre le chemin total parcouru
 
-
     def bellman_ford(self, start_coords:tuple):
         """
-        Algorithme de Bellman-Ford pour trouver les plus courts chemins depuis un noeud de départ.
+        Implémente l'algorithme de Bellman-Ford pour trouver le plus court chemin depuis un nœud de départ.
         """
-        start_node = self.grid.get_node(*start_coords)
-        if not start_node:
-            raise ValueError("Le noeud de départ n'existe pas dans la grille.")
-
-        # Initialisation des distances et des prédécesseurs
+        # Initialisation
         distance = {node: float('inf') for node in self.grid.nodes.values()}
         predecessor = {node: None for node in self.grid.nodes.values()}
+        start_node = self.grid.get_node(*start_coords)
         distance[start_node] = 0
 
         # Relaxation des arêtes
         for _ in range(len(self.grid.nodes) - 1):
+            updated = False
             for node in self.grid.nodes.values():
                 if not node.active:
                     continue
@@ -38,6 +35,10 @@ class BF:
                         if distance[node] + neighbor.valeur < distance[neighbor]:
                             distance[neighbor] = distance[node] + neighbor.valeur
                             predecessor[neighbor] = node
+                            self.total_path.append((neighbor.x, neighbor.y, neighbor.z))
+                            updated = True
+            if not updated:
+                break
 
         # Vérification des cycles négatifs
         for node in self.grid.nodes.values():
@@ -50,7 +51,28 @@ class BF:
 
         return distance, predecessor
 
-    def reconstruct_path(self, predecessor, start_node, goal_node):
+    def find_shortest_path(self, start_coords:tuple, goal_coords:tuple):
+        """
+        Trouve le chemin le plus court entre le noeud de départ et le noeud d'arrivée en utilisant Bellman-Ford.
+        """
+        distance, predecessor = self.bellman_ford(start_coords)
+        start_node = self.grid.get_node(*start_coords)
+        goal_node = self.grid.get_node(*goal_coords)
+
+        if distance[goal_node] == float('inf'):
+            raise ValueError("Aucun chemin trouvé entre le noeud de départ et le noeud d'arrivée.")
+
+        path = self.reconstruct_path(predecessor, goal_node)
+        
+        # Ajouter le chemin de retour à l'origine à total_path
+        current = goal_node
+        while current is not None:
+            self.total_path.append((current.x, current.y, current.z))
+            current = predecessor[current]
+        
+        return path, distance[goal_node]
+
+    def reconstruct_path(self, predecessor:dict, goal_node:Node):
         """
         Reconstruit le chemin à partir du dictionnaire des prédécesseurs.
         """
@@ -62,25 +84,10 @@ class BF:
         path.reverse()
         return path
 
-    def find_shortest_path(self, start_coords: tuple, goal_coords: tuple):
-        """
-        Trouve le chemin le plus court entre le noeud de départ et le noeud d'arrivée.
-        """
-        distances, predecessor = self.bellman_ford(start_coords)
-        start_node = self.grid.get_node(*start_coords)
-        goal_node = self.grid.get_node(*goal_coords)
-
-        if distances[goal_node] == float('inf'):
-            raise ValueError("Aucun chemin trouvé entre le noeud de départ et le noeud d'arrivée.")
-
-        path = self.reconstruct_path(predecessor, start_node, goal_node)
-        return path, distances[goal_node]
-
-    def parcours(self, start_coords: tuple, goal_coords: tuple):
+    def parcours(self, start_coords:tuple, goal_coords:tuple):
         """
         Méthode parcours qui réalise le parcours Bellman-Ford et explore les chemins.
         Prend en paramètre les coordonnées de départ et d'arrivée.
         """
-        path_to_target, total_path = self.find_shortest_path(start_coords, goal_coords)
-        return path_to_target, total_path
-
+        path_to_target, _ = self.find_shortest_path(start_coords, goal_coords)
+        return path_to_target, self.total_path
