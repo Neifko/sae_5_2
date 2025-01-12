@@ -454,6 +454,7 @@ class MainController:
             grid = self.grid
             for node in grid.nodes.values():
                 node.active = True
+                node.valeur = 1
 
     def clear_results(self):
         self.clear_arrows()
@@ -628,7 +629,7 @@ class MainController:
                         else:
                             node_modif.active = True
                             print("Pas désactivé")
-
+                        self.update_node_value(node_modif, self.current_color)
                     break
 
     def on_canvas_release(self, event):
