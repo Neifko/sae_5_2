@@ -16,7 +16,14 @@ class TopNavbar(ctk.CTkFrame):
 
         # Créer un tk.Canvas dans le tk.Frame
         self.canvas = tk.Canvas(self.frame, bg=bg_color, highlightthickness=0)
-        self.canvas.pack(side="left", fill="both", expand=True)
+        self.canvas.pack(side="top", fill="both", expand=True)
+
+        # Créer une barre de défilement horizontale
+        self.scrollbar = tk.Scrollbar(self.frame, orient="horizontal", command=self.canvas.xview)
+        self.scrollbar.pack(side="bottom", fill="x")
+
+        # Configurer le Canvas pour utiliser la barre de défilement
+        self.canvas.configure(xscrollcommand=self.scrollbar.set)
 
         # Lier l'événement de défilement de la molette au Canvas
         self.canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)  # Pour Windows
@@ -102,6 +109,3 @@ class TopNavbar(ctk.CTkFrame):
                 self.canvas.xview_scroll(-1, "units")
             elif event.num == 5:
                 self.canvas.xview_scroll(1, "units")
-
-
-
