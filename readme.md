@@ -103,10 +103,10 @@ L'interface est composée de trois parties ; le menu de gauche (**LeftNavbar**),
 La liste des algoithmes implémentés dasn le logiciel est la suivante : 
 
 * **Parcours en profondeur :** [ParcoursProfondeur.py](./sae_5_2/models/ParcoursProfondeur.py)
-* **Parcours en largeur :** 
+* **Parcours en largeur :** [algoBFS.py](./sae_5_2/models/algoBFS.py)
 * **Dijkstra :** [Djikstra.py](./sae_5_2/models/Dijkstra.py)
 * **Bellman-Ford :** [BF.py](./sae_5_2/models/BF.py)
 * **A * :** [AEtoile.py](./sae_5_2/models/AEtoile.py)
-* **Stable maximum :**
+* **Stable maximum :** [stableMax.py](./sae_5_2/models/stableMax.py)
 * ****
 * ****
