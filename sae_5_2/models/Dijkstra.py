@@ -98,7 +98,7 @@ class Dijkstra:
         best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
         all_paths_to_target_tuples = [
             [(node.x, node.y, node.z) for node in path]
-            for path in all_paths[target_node][:50] # limite à 25 chemins car trop long sinon
+            for path in all_paths[target_node][:50] # limite à 50 chemins car trop long sinon
         ]
 
         return best_path_tuples, all_paths_to_target_tuples
