@@ -42,7 +42,7 @@ class AEtoile:
                 path_to_target = self.reconstruct_path(came_from, current)
                 total_path = self.construct_total_path(came_from, start_node, goal_node)
                 print(f"\n came_from : {came_from}")
-                return path_to_target, path_to_target
+                return path_to_target, total_path
 
             open_set.remove(current)
             self.visited.add(current)
