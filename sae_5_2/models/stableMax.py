@@ -7,14 +7,18 @@ class StableMaximumSetSolver:
         self.max_set = []
 
     def is_stable(self, node, included_nodes):
-        """Vérifie si le nœud peut être ajouté à l'ensemble courant sans violer la stabilité."""
+        """Vérifie si le nœud peut être ajouté à l'ensemble courant."""
         for neighbor in node.voisins.values():
             if neighbor in included_nodes:
                 return False
         return True
 
     def find_stableMax(self):
-        """Trouve un ensemble stable maximum dans la grille en utilisant la programmation dynamique."""
+        """
+        Trouve un ensemble stable maximum dans la grille en utilisant la programmation dynamique.
+        Returns:
+            set: Ensemble stable maximum
+        """
         nodes = list(self.grid.nodes.values())
         n = len(nodes)
 
@@ -27,11 +31,14 @@ class StableMaximumSetSolver:
                 if not n.active
             ]  # Liste des voisins non visités et actifs
 
+        # Parcours des nœuds pour trouver l'ensemble stable maximum
         for i in range(n):
             node = nodes[i]
             # Vérifier si le nœud peut être inclus
             for j in range(i):
+                # Vérifier si le nœud est stable et s'il n'est pas déjà visité
                 if self.is_stable(node, included[j]) and node not in unvisited_neighbors:
+                    # Compare la taille de l'ensemble actuel avec le nouvel ensemble
                     if dp[j] + 1 > dp[i + 1]:
                         dp[i + 1] = dp[j] + 1
                         included[i + 1] = included[j].copy()
