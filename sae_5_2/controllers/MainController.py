@@ -1,5 +1,6 @@
 import math
 import random
+
 import customtkinter as ctk
 
 from sae_5_2.models.Grid import Grid
@@ -10,7 +11,7 @@ from sae_5_2.controllers.BellmanFordController import BellmanFordController
 from sae_5_2.controllers.AEtoileController  import AEtoileController
 from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.controllers.stableMaxController import stableMaxController
-
+from sae_5_2.controllers.ComposantesConnexesController import ComposantesConnexesController
 
 class MainController:
     def __init__(self, view):
@@ -28,6 +29,7 @@ class MainController:
         self.bellman_ford_controller = BellmanFordController()
         self.algoBFSController = algoBFSController()
         self.stableMax = stableMaxController()
+        self.composantes_connexes_controller = ComposantesConnexesController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -216,6 +218,17 @@ class MainController:
 
         # Dessiner les chemins
         self.draw_path(path_to_target, all_path)
+
+    def call_composantes_connexes(self):
+        self.composantes_connexes_controller.set_grid(self.grid)
+        print("callcomposantesconnexesMain controller")
+        composantes_connexes = self.composantes_connexes_controller.execute()
+        for composantes in composantes_connexes:
+            for noeud in composantes:
+                print("noeud :", noeud)
+                hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
+                self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="cyan")
+
 
     def call_aetoile(self):
         """
