@@ -29,6 +29,8 @@ Voici la composition du logiciel (cliquez):
 
 * [controllers](./sae_5_2/controllers/) : Contient les fichiers relatifs aux Controlleurs. Encore une fois, ce répertoire est composé d'un controleur principal [MainController.py](./sae_5_2/controllers/MainController.py) qui appelle les controlleurs des différents parcours.
 
+Egalement, vous retrouverez le sujet de la SAE [ici](./documents/topic.md), la vidéo explicative [ici](./documents/hexagones2.mp4). Vous trouverez aussi un document qui explique brèvement les algortihmes implémentés [ici](./readme.md).
+
 
 ### 3) Procédure  
 
@@ -69,3 +71,24 @@ pip install -r requirements.yml
 ```
 
 ### 4) Utilisation
+
+Dans un terminal, afin de lancer le logiciel, il faut se déplacer à la [racine du projet](./) et éxecuter la commande suivante : 
+
+```shell
+python -m sae_5_2
+```
+ou
+```
+python3 -m sae_5_2
+```
+Une fenêtre python se lancera avec l'interface graphique du logiciel comme ci dessous : 
+
+![Utilisation 1](./documents/image_utilisation_1.png)
+
+L'interface est composée de trois parties ; le menu de gauche (**LeftNavbar**), le menu d'en haut (**TopNavbar**) et la fenêtre pincipale (**MainFrame**).
+
+* **LeftNavbar :** Dans ce menu, vous pouvez choisir le nombre de noeuds dans la grille en établissant le nombre de colonnes et de lignes. Vous pouvez également dessiner une grille complète en fonction de la taille de l'écran et agrandir/diminuer la taille des noeuds. Il y a également un bouton poussoir afin d'afficher les coordonées des noeuds. Finalement, comme dans le sujet, il y a les boutons afin de changer la couleur des noeuds et attribuer des valeurs différentes aux déplacements.
+
+* **TopNavbar :** A l'instar du sujet, ce menu permet de choisir les algorithmes à visualiser ainsi que d'éfacer soit les résultats, soit tout.  
+
+* **MainFrame :** Contient l'ensemble des noeuds et permet d'afficher les déplacements et le chemin final en prenant en compte les couleurs.
