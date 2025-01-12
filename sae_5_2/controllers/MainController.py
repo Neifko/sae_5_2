@@ -308,6 +308,10 @@ class MainController:
                     node_modif.active = True
                     print(f"Node ({hex_x}, {hex_y}) activé")
 
+            # Mettre à jour la valeur en fonction de la couleur
+            self.update_node_value(node_modif, color)
+
+
     # TODO : reste du graphique ici
 
     def draw_arrow(self, x1, y1, x2, y2, color="#9900CC"):
@@ -585,7 +589,21 @@ class MainController:
                             node_modif.active = True
                             print("Pas désactivé")
 
+                        # Mettre à jour la valeur en fonction de la couleur
+                        self.update_node_value(node_modif, self.current_color)
+
                 break
+
+
+    def update_node_value(self, node, color):
+        if color == "Blue":
+            node.valeur = 5
+        elif color == "Green":
+            node.valeur = 3
+        elif color == "Yellow":
+            node.valeur = 2
+        else:
+            node.valeur = 1  # Valeur par défaut pour les autres couleurs
 
 
     def on_canvas_motion(self, event):
