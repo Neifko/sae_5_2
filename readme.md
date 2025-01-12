@@ -15,7 +15,7 @@
 Le but de ce logiciel est de fournir un outil pédagogique permettant de mieux comprendre et visualiser les algorithmes de la théorie des graphes. Il doit permettre aux utilisateurs de suivre pas à pas l'exécution de ces algorithmes, facilitant ainsi l'apprentissage et la compréhension des concepts complexes associés aux graphes.  
 
 
-***Chemin trouvé par A* sur notre logiciel***
+***Chemin trouvé par `A*` sur notre logiciel***
 ![Algo A* de notre logiciel](./documents/image_but_du_logiciel.png)
 
 
