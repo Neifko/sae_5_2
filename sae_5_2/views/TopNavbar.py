@@ -37,9 +37,9 @@ class TopNavbar(ctk.CTkFrame):
             elif action == "Aléatoire":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
-                button = ctk.CTkButton(self, text=action, command=self.call_profondeur)
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_profondeur)
             elif action == "Dijkstra":
-                button = ctk.CTkButton(self, text=action, command=self.call_dijkstra)
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_dijkstra)
             elif action == "Parcours en largeur":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_largeur)
             elif action == "Bellman-Ford":
