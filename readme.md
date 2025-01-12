@@ -9,14 +9,20 @@
 2. [Description](#2-description)
 3. [Procédure](#3-procédure)
 4. [Utilisation](#4-utilisation)
+5. [Algorithmes implémentés](#5-Algorithmes-implémentés)
 
 
 ### 1) But du logiciel
 Le but de ce logiciel est de fournir un outil pédagogique permettant de mieux comprendre et visualiser les algorithmes de la théorie des graphes. Il doit permettre aux utilisateurs de suivre pas à pas l'exécution de ces algorithmes, facilitant ainsi l'apprentissage et la compréhension des concepts complexes associés aux graphes.  
 
 
-***Chemin trouvé par A * sur notre logiciel***
+***Chemin trouvé par A* sur notre logiciel***
 ![Algo A* de notre logiciel](./documents/image_but_du_logiciel.png)
+
+***Explications***
+* Le nœud rose correspond au départ tandis que le nœud rouge est l'objectif
+* Les nœuds noirs sont désactivés. Il s'agit de murs
+* Les nœuds bleu, vert et jaune correspondent respectivement à des ralentissements de 5, 3 et 2.
 
 
 ### 2) Description  
