@@ -13,6 +13,7 @@ class Dijkstra:
     def __init__(self, grid):
         self.grid = grid
 
+
     def shortest_path(self, start_coords, target_coords):
         """
         Trouve le plus court chemin entre deux node sur une grille hexagonale
