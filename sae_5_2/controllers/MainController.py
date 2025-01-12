@@ -11,7 +11,6 @@ from sae_5_2.controllers.AEtoileController  import AEtoileController
 from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.controllers.stableMaxController import stableMaxController
 
-
 class MainController:
     def __init__(self, view):
         self.main_view = view
@@ -65,9 +64,12 @@ class MainController:
         self.circle_ids = {}
         self.liste_stable = []
 
+        # Variable pour suivre l'état du parcours en cours
+        self.pathfinding_in_progress = False
+        self.stop_drawing = False  # Variable pour arrêter le dessin
+
     def generate_grid(self, rows, cols):
         return Grid(rows, cols)
-
 
     def draw_hex_grid(self, rows, cols, size):
         font_size = max(8, int(size * 0.4))
@@ -129,12 +131,17 @@ class MainController:
         return (x, y, z)
 
     def call_profondeur(self):
+        
         if self.path_drawn:
+            self.stop_drawing = False
             self.clear_results()
 
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
+        
+        # pour mettre à jour l'interface avec les bons resultats des variables
+        self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
@@ -163,6 +170,8 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
+
+        self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
@@ -195,6 +204,8 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
+        
+        self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
@@ -217,7 +228,6 @@ class MainController:
         # Dessiner les chemins
         self.draw_path_with_circles(path_to_target, total_path)
 
-
     def call_bellmanford(self):
         """
         Fonction d'écoute pour le bouton Bellman-Ford.
@@ -228,6 +238,8 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
+        
+        self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
@@ -249,7 +261,6 @@ class MainController:
 
         # Dessiner les chemins
         self.draw_path_with_circles(path_to_target, total_path)
-
 
     def random_case_colors(self):
         # Parcourir tous les hexagones et leur attribuer une couleur aléatoire
@@ -328,6 +339,8 @@ class MainController:
             self.main_view.main_frame.hex_canvas.create_text(x, y, text=label, fill="black", font=("Arial", font_size))
 
     def clear_canvas(self):
+        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
+        self.stop_drawing = True  # Arrêter le dessin
         self.reset_hexagon_colors()
         self.clear_results()
         self.reactivate_all_nodes()
@@ -342,7 +355,14 @@ class MainController:
                 node.active = True
                 node.valeur = 1
 
+    def reset_interface_state(self):
+        self.pathfinding_in_progress = False  # Interrompre le parcours en cours
+        self.stop_drawing = False  # Arrêter le dessin
+        self.path_drawn = False  # Réinitialiser l'état du chemin dessiné
+        self.main_view.update_idletasks()
+
     def clear_results(self):
+        self.stop_drawing = True  # Arrêter le dessin
         # Effacer tous les résultats stockés dans la liste
         for result in self.results:
             self.main_view.main_frame.hex_canvas.delete(result)
@@ -366,9 +386,8 @@ class MainController:
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
-            # TODO : veirifer
+            # TODO : verifier
             self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
-
 
         # Clear circles
         for circle_id in self.circle_ids.values():
@@ -500,7 +519,6 @@ class MainController:
 
                 break
 
-
     def update_node_value(self, node, color):
         if color == "Blue":
             node.valeur = 5
@@ -510,7 +528,6 @@ class MainController:
             node.valeur = 2
         else:
             node.valeur = 1  # Valeur par défaut pour les autres couleurs
-
 
     def on_canvas_motion(self, event):
         if not self.depart_mode and not self.objectif_mode:
@@ -541,7 +558,6 @@ class MainController:
         self.depart_mode = False
         self.objectif_mode = False
 
-
     def call_largeur(self):
         if self.path_drawn:
             self.clear_results()
@@ -549,6 +565,8 @@ class MainController:
         if not self.depart_hex or not self.objectif_hex:
             print("Veuillez définir une case de départ et une case d'objectif.")
             return
+        
+        self.reset_interface_state()
 
         depart_cubique = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
         arrive_cubique = self.hex_id_get_coords[self.hexagons[self.objectif_hex]]
@@ -562,7 +580,6 @@ class MainController:
         path = [(node.x, node.y, node.z) for node in path_to_target] # Convertir les nœuds en coordonnées cubiques
         total_path = [(node.x, node.y, node.z) for node in total_path]  # Convertir les nœuds en coordonnées cubiques
 
-
         if path_to_target:
             print(f"Un chemin existe entre {depart_cubique} et {arrive_cubique}.")
             print(f"Chemin vers la cible : {path}")
@@ -575,11 +592,12 @@ class MainController:
         # Dessiner les chemins
         self.draw_path_with_circles(path, total_path)
 
-
     def call_stableMax(self):
         if self.path_drawn:
             self.clear_results()
-        
+
+        # self.reset_interface_state()
+
         self.stableMax.set_grid(self.grid)
         stableMax = self.stableMax.run_stableMax()
         for noeud in stableMax:
@@ -607,6 +625,9 @@ class MainController:
                 depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
                 visited_nodes.add(depart_coords)
             for coords in k:
+                if self.stop_drawing:
+                    self.stop_drawing = False
+                    return  # Arrêter le dessin si nécessaire
                 # Vérifier que les coordonnées existent dans le dictionnaire
                 if coords in self.hex_id_get_coords.values():
                     hex_id = [key for key, value in self.hex_id_get_coords.items() if value == coords][0]
@@ -634,10 +655,13 @@ class MainController:
 
                         # Ajouter le nœud à l'ensemble des nœuds visités
                         visited_nodes.add(coords)
-
+            self.stop_drawing = False
         # Dessiner des flèches violettes pour le chemin vers la cible
         if path_to_target:
             for i in range(len(path_to_target) - 1):
+                if self.stop_drawing:
+                    self.stop_drawing = False
+                    return  # Arrêter le dessin si nécessaire
                 coords1 = path_to_target[i]
                 coords2 = path_to_target[i + 1]
 
@@ -668,4 +692,8 @@ class MainController:
                         # Ajouter un délai pour voir le chemin se dessiner progressivement
                         self.main_view.after(2)  # Définir le délai en millisecondes
                         self.main_view.update()
+            self.stop_drawing = False
+
+        # Forcer la mise à jour de l'interface après avoir dessiné le chemin
+        self.main_view.update_idletasks()
 
