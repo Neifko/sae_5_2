@@ -80,7 +80,7 @@ class Dijkstra:
 
                 elif distance == distances[neighbor]:
                     all_paths[neighbor].extend(path + [neighbor] for path in all_paths[current_node])
-                    all_paths[neighbor] = all_paths[neighbor][:25]
+                    all_paths[neighbor] = all_paths[neighbor][:50]
 
         # Reconstruction du chemin à partir du dictionnaire previous_nodes
         best_path = []
@@ -98,7 +98,7 @@ class Dijkstra:
         best_path_tuples = [(node.x, node.y, node.z) for node in best_path]
         all_paths_to_target_tuples = [
             [(node.x, node.y, node.z) for node in path]
-            for path in all_paths[target_node][:25] # limite à 25 chemins car trop long sinon
+            for path in all_paths[target_node][:50] # limite à 25 chemins car trop long sinon
         ]
 
         return best_path_tuples, all_paths_to_target_tuples
