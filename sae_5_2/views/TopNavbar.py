@@ -35,7 +35,7 @@ class TopNavbar(ctk.CTkFrame):
         self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
 
         actions = ["Effacer Tout", "Effacer Résultats", "Aléatoire", "Parcours en profondeur", "Parcours en largeur",
-                   "Bellman-Ford", "Dijkstra", "A*", "Stable maximum"]
+                   "Bellman-Ford", "Dijkstra", "A*", "Stable maximum", "Composantes Connexes"]
         for action in actions:
             if action == "Effacer Tout":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_canvas)
@@ -55,6 +55,8 @@ class TopNavbar(ctk.CTkFrame):
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_aetoile)
             elif action == "Stable maximum":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_stableMax)
+            elif action == "Composantes Connexes":
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.call_composantes_connexes)
             else:
                 button = ctk.CTkButton(self.inner_frame, text=action, command=lambda a=action: print(a))
             button.pack(side=tk.LEFT, padx=5, pady=5)
@@ -99,6 +101,9 @@ class TopNavbar(ctk.CTkFrame):
 
     def call_stableMax(self):
         self.get_controller().call_stableMax()
+
+    def call_composantes_connexes(self):
+        self.get_controller().call_composantes_connexes()
 
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette

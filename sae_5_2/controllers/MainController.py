@@ -1,5 +1,6 @@
 import math
 import random
+
 import customtkinter as ctk
 
 from sae_5_2.models.Grid import Grid
@@ -10,7 +11,7 @@ from sae_5_2.controllers.BellmanFordController import BellmanFordController
 from sae_5_2.controllers.AEtoileController  import AEtoileController
 from sae_5_2.controllers.algoBFSController import algoBFSController
 from sae_5_2.controllers.stableMaxController import stableMaxController
-
+from sae_5_2.controllers.ComposantesConnexesController import ComposantesConnexesController
 
 class MainController:
     def __init__(self, view):
@@ -28,6 +29,7 @@ class MainController:
         self.bellman_ford_controller = BellmanFordController()
         self.algoBFSController = algoBFSController()
         self.stableMax = stableMaxController()
+        self.composantes_connexes_controller = ComposantesConnexesController()
 
         # Variable pour suivre la couleur actuelle
         self.current_color = None  # Couleur transparente par défaut
@@ -184,6 +186,12 @@ class MainController:
 
         # Dessiner les chemins
         self.draw_path_with_circles(path_to_target, all_path)
+
+    def call_composantes_connexes(self):
+        self.composantes_connexes_controller.set_grid(self.grid)
+        composantes_connexes = self.composantes_connexes_controller.execute()
+
+        self.draw_path_with_circles(None, composantes_connexes)
 
     def call_aetoile(self):
         """

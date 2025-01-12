@@ -11,7 +11,7 @@ class TestPrimAlgorithm(unittest.TestCase):
         Création d'une grille hexagonale pour les tests.
         """
         self.grid = Grid(4, 4)  # Grille de 4x4
-        self.start_coords = (0, 0, 0)  # Coordonnées du nœud de départ
+        self.start_coords = (0,0,0)  # Coordonnées du nœud de départ
 
         # Modifier les valeurs des nœuds pour les tests
         self.grid.get_node(2, 2, -4).valeur = 2
@@ -42,14 +42,14 @@ class TestPrimAlgorithm(unittest.TestCase):
 
         # Poids attendu basé sur les valeurs assignées dans `setUp`
         # Ex. MST = (0, 0, 0) -> (0, 1, -1) -> (1, 1, -2)
-        expected_weight = 3+4+1+1+1+5+1+1+1+1+2+1+1+1+1 # CA fait 25  # Somme des poids des arêtes
+        expected_weight = 3+4+1+1+1+5+1+1+1+1+2+1+1+1+1 # Ça fait 25 # Somme des poids des arêtes
         self.assertEqual(total_weight, expected_weight)
 
     def test_invalid_start_coords(self):
         """
         Teste si une erreur est levée pour des coordonnées invalides.
         """
-        invalid_coords = (10, 10, -20)  # Coordonnées qui n'existent pas
+        invalid_coords = (10, 10, -20)  # Coordonnées qui n’existent pas
         with self.assertRaises(ValueError):
             prim_algorithm(self.grid, invalid_coords)
 
@@ -66,6 +66,8 @@ class TestPrimAlgorithm(unittest.TestCase):
         # Poids attendu, en ignorant le nœud inactif
         expected_weight = 1+1+1+1+1+1+1+1+2+1+1 # Ca fait 12 # chemin (0,0,0) -> (1,0,-1) -> (2,-1,-1) ...
         self.assertEqual(total_weight, expected_weight)
+        print(mst)
+        print(total_weight)
 
 
 if __name__ == "__main__":
