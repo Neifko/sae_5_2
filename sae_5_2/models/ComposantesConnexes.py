@@ -22,8 +22,7 @@ class ComposantesConnexes:
                 _, component = dfs.parcours(node_coords, None)
                 if component:
                     visited.update(component)
-                    component_nodes = [self.grid.nodes[coords] for coords in component]
                     print(visited, component)
-                    components.append(component_nodes)
+                    components.append(component)
 
         return components

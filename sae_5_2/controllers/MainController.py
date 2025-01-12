@@ -189,14 +189,9 @@ class MainController:
 
     def call_composantes_connexes(self):
         self.composantes_connexes_controller.set_grid(self.grid)
-        print("callcomposantesconnexesMain controller")
         composantes_connexes = self.composantes_connexes_controller.execute()
-        for composantes in composantes_connexes:
-            for noeud in composantes:
-                print("noeud :", noeud)
-                hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
-                self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="cyan")
 
+        self.draw_path_with_circles(None, composantes_connexes)
 
     def call_aetoile(self):
         """
