@@ -17,9 +17,6 @@ class algoBFSController:
     def set_grid(self, grid):
         """
         Définit la grille pour le parcours en largeur.
-
-        Params:
-            grid (Grid): Instance de la classe Grid représentant la grille.
         """
         self.grid = grid
         self.parcours_largeur = AlgoBFS(grid)

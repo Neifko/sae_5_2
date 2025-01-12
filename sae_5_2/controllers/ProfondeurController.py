@@ -3,12 +3,22 @@ from sae_5_2.models.ParcoursProfondeur import ParcoursProfondeur
 
 
 class ProfondeurController:
-  
+    """
+    Contrôleur pour exécuter et afficher un parcours en profondeur (DFS) sur une grille.
+    Permet d'initialiser une grille, de réaliser un parcours en profondeur et de visualiser les résultats.
+    """
+
     def __init__(self):
+        """
+        Initialise le contrôleur avec une grille et un objet de parcours en profondeur non définis.
+        """
         self.grid = None
         self.parcours_profondeur = None
 
     def set_grid(self, grid):
+        """
+        Définit la grille à utiliser pour le parcours en profondeur.
+        """
         self.grid = grid
         self.parcours_profondeur = ParcoursProfondeur(grid)
 
@@ -41,6 +51,18 @@ class ProfondeurController:
         print(f"Chemin total parcouru : {total_path}")
 
     def execute(self, start_coords, target_coords):
+        """
+        Exécute un parcours en profondeur (DFS) entre deux points de la grille.
+
+        Args:
+            start_coords (tuple): Coordonnées (x, y, z) du nœud de départ.
+            target_coords (tuple): Coordonnées (x, y, z) du nœud d'arrivée.
+
+        Returns:
+            tuple: 
+                - path_to_target (list): liste de noeuds qui donne le chemin vers target_coords,
+                  ou une liste vide si aucun chemin n'existe.
+                - total_path (list): Liste des nœuds visités par l'algorithme.
+        """
         path_to_target, total_path = self.parcours_profondeur.parcours(start_coords, target_coords)
         return path_to_target, total_path
-
