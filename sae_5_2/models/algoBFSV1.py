@@ -19,8 +19,6 @@ class AlgoBFS:
             grid (Grid): Instance de la classe Grid représentant la grille hexagonale.
         """
         self.grid = grid  # Associe la grille fournie à l'algorithme.
-        self.total_path = []  # Liste pour suivre le chemin total parcouru
-
 
     def find_path(self, start, goal):
         """
@@ -41,32 +39,24 @@ class AlgoBFS:
         queue = [start]
         # Dictionnaire pour stocker le parent de chaque nœud visité.
         visited = {start: None}
-        self.total_path = []  # Réinitialise le chemin total parcouru
 
         # Boucle principale du BFS.
         while queue:
             current = queue.pop(0)  # Récupère le nœud actuel en début de file.
-            self.total_path.append(current)  # Ajoute le nœud actuel au chemin total parcouru
-
-            unvisited_neighbors = [
-                n for n in current.voisins.values()
-                if (n.x, n.y, n.z) not in visited and n.active
-            ]  # Liste des voisins non visités et actifs
 
             # Si on atteint le nœud d'arrivée, reconstruit et retourne le chemin.
             if current == goal:
-                return self._reconstruct_path(visited, start, goal), self.total_path
+                return self._reconstruct_path(visited, start, goal)
 
             # Parcourt les voisins du nœud actuel.
-            for neighbor in unvisited_neighbors:
+            for direction, neighbor in current.voisins.items():
                 # Si le voisin n'a pas encore été visité, on l'ajoute à la file et on marque son origine.
                 if neighbor not in visited:
                     queue.append(neighbor)
                     visited[neighbor] = current
-                    #self.total_path.append(current)  # Ajoute le nœud actuel au chemin total parcouru
 
-        return [], self.total_path  # Retourne une liste vide si aucun chemin n'existe, et le chemin total parcouru
-
+        # Si aucun chemin n'a été trouvé, retourne une liste vide.
+        return []
 
     def _reconstruct_path(self, visited, start, goal):
         """
@@ -92,4 +82,57 @@ class AlgoBFS:
         path.append(start)
         # Inverse la liste pour obtenir le chemin dans l'ordre correct.
         path.reverse()
-        return path  # Retourne le chemin complet
+        return path
+
+import unittest
+import Grid
+
+class TestBFS(unittest.TestCase):
+    def test_bfs(self):
+        """
+        Fonction de test pour l'algorithme BFS sur une grille hexagonale.
+        Teste différents scénarios pour vérifier la validité de l'implémentation.
+        """
+        print("=== Test de l'algorithme BFS ===")
+        
+        # Création d'une grille hexagonale 5x5
+        grid = Grid.Grid(3, 3)  # Initialise une grille hexagonale de 5 lignes et 5 colonnes.
+        bfs = AlgoBFS(grid)  # Crée une instance de l'algorithme BFS avec cette grille.
+
+        # Test 1 : Chemin simple entre deux nœuds
+        start = grid.get_node(0, 2, -2)  # Nœud de départ
+        goal = grid.get_node(2, 0, -2)  # Nœud d'arrivée
+        path = bfs.find_path(start, goal)  # Recherche le chemin
+        print("\nTest 1: Chemin simple")
+        print("Chemin trouvé :", path)
+        self.assertIsNotNone(path, "Le chemin ne doit pas être None")
+        self.assertGreater(len(path), 0, "Le chemin doit contenir au moins un nœud")
+
+        # # Test 2 : Départ et arrivée sont le même nœud
+        # start = grid.get_node(1, 1, -2)  # Nœud de départ et d'arrivée
+        # goal = grid.get_node(1, 1, -2)
+        # path = bfs.find_path(start, goal)  # Recherche le chemin
+        # print("\nTest 2: Départ et arrivée identiques")
+        # print("Chemin trouvé :", path)
+        # self.assertEqual(path, [start], "Le chemin doit contenir uniquement le nœud de départ")
+
+        # # Test 3 : Aucun chemin possible
+        # # Supposons que certains nœuds sont déconnectés ou inexistants
+        # start = grid.get_node(0, 0, 0)  # Nœud de départ
+        # goal = grid.get_node(5, 5, -10)  # Nœud d'arrivée inexistant
+        # path = bfs.find_path(start, goal)  # Recherche le chemin
+        # print("\nTest 3: Aucun chemin possible")
+        # print("Chemin trouvé :", path)
+        # self.assertIsNone(path, "Le chemin doit être None si aucun chemin n'est possible")
+
+        # # Test 4 : Plus grand chemin dans une grille dense
+        # start = grid.get_node(0, 0, 0)  # Nœud de départ
+        # goal = grid.get_node(4, 0, -4)  # Nœud d'arrivée à l'autre extrémité de la grille
+        # path = bfs.find_path(start, goal)  # Recherche le chemin
+        # print("\nTest 4: Plus grand chemin")
+        # print("Chemin trouvé :", path)
+        # self.assertIsNotNone(path, "Le chemin ne doit pas être None")
+        # self.assertGreater(len(path), 0, "Le chemin doit contenir au moins un nœud")
+
+if __name__ == '__main__':
+    unittest.main()

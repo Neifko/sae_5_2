@@ -1,6 +1,6 @@
-import sae_5_2.models.Grid as Grid
+import Grid as Grid
 
-class StableMaximumSetSolver:
+class DynamicProgrammingStableMaximumSetSolver:
     def __init__(self, grid):
         """Initialise le solveur avec une instance de Grid."""
         self.grid = grid
@@ -13,7 +13,7 @@ class StableMaximumSetSolver:
                 return False
         return True
 
-    def find_stableMax(self):
+    def find_stable_maximum_set(self):
         """Trouve un ensemble stable maximum dans la grille en utilisant la programmation dynamique."""
         nodes = list(self.grid.nodes.values())
         n = len(nodes)
@@ -22,16 +22,11 @@ class StableMaximumSetSolver:
         dp = [0] * (n + 1)
         included = [set() for _ in range(n + 1)]
 
-        unvisited_neighbors = [
-                n for n in nodes
-                if not n.active
-            ]  # Liste des voisins non visités et actifs
-
         for i in range(n):
             node = nodes[i]
             # Vérifier si le nœud peut être inclus
             for j in range(i):
-                if self.is_stable(node, included[j]) and node not in unvisited_neighbors:
+                if self.is_stable(node, included[j]):
                     if dp[j] + 1 > dp[i + 1]:
                         dp[i + 1] = dp[j] + 1
                         included[i + 1] = included[j].copy()
@@ -42,15 +37,13 @@ class StableMaximumSetSolver:
         self.max_set = included[dp.index(max_size)]
         return self.max_set
 
-    
-    
-def test_stable_maximum_set_solver():
-    """Fonction de tests pour StableMaximumSetSolver."""
+def test_dynamic_programming_stable_maximum_set_solver():
+    """Fonction de tests pour DynamicProgrammingStableMaximumSetSolver."""
     # Créer une grille de test
-    grid = Grid.Grid(rows=3, cols=3)  # Exemple d'une petite grille 3x3
+    grid = Grid.Grid(rows=10, cols=10)  # Exemple d'une petite grille 5x5
 
     # Créer un solveur pour l'ensemble stable maximum
-    solver = StableMaximumSetSolver(grid)
+    solver = DynamicProgrammingStableMaximumSetSolver(grid)
 
     # Trouver l'ensemble stable maximum
     max_stable_set = solver.find_stable_maximum_set()
@@ -75,4 +68,4 @@ def test_stable_maximum_set_solver():
         print("Test échoué: L'ensemble n'est pas stable.")
 
 # Appeler la fonction de tests
-# test_stable_maximum_set_solver()
+test_dynamic_programming_stable_maximum_set_solver()

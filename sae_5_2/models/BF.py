@@ -1,15 +1,19 @@
-"""
-Classe BF.py (Bellman-Ford) : Implementation de l'algorithme Bellman-Ford 
-"""
 from sae_5_2.models.Grid import Grid
 from sae_5_2.models.Node import Node
 
 class BF:
+    """
+    Classe BF.py (Bellman-Ford) : Implementation de l'algorithme Bellman-Ford 
+    """
     def __init__(self, grid:Grid):
         """
         Constructeur de la classe BF qui prend en paramètre une grille de noeuds.
         """
         self.grid = grid
+        self.visited = set()  # Ensemble pour suivre les noeuds visités
+        self.parent = {}  # Dictionnaire pour suivre les noeuds parents
+        self.total_path = []  # Liste pour suivre le chemin total parcouru
+
 
     def bellman_ford(self, start_coords:tuple):
         """
@@ -53,7 +57,7 @@ class BF:
         path = []
         current = goal_node
         while current is not None:
-            path.append(current)
+            path.append((current.x, current.y, current.z))
             current = predecessor[current]
         path.reverse()
         return path
@@ -71,3 +75,12 @@ class BF:
 
         path = self.reconstruct_path(predecessor, start_node, goal_node)
         return path, distances[goal_node]
+
+    def parcours(self, start_coords: tuple, goal_coords: tuple):
+        """
+        Méthode parcours qui réalise le parcours Bellman-Ford et explore les chemins.
+        Prend en paramètre les coordonnées de départ et d'arrivée.
+        """
+        path_to_target, total_path = self.find_shortest_path(start_coords, goal_coords)
+        return path_to_target, path_to_target
+
