@@ -3,8 +3,14 @@ import customtkinter as ctk
 
 class TopNavbar(ctk.CTkFrame):
     def __init__(self, parent):
-        # Définir une couleur de fond personnalisée
-        bg_color = "#2B2B2B"  # Couleur de fond personnalisée
+        # Obtenir le mode actuel (clair ou sombre)
+        appearance_mode = ctk.get_appearance_mode()
+
+        # Définir la couleur de fond en fonction du mode actuel
+        if appearance_mode == "Dark":
+            bg_color = "#2B2B2B"  # Couleur de fond pour le mode sombre
+        else:
+            bg_color = "white"  # Couleur de fond pour le mode clair
 
         super().__init__(parent, fg_color=bg_color)
 
@@ -70,7 +76,6 @@ class TopNavbar(ctk.CTkFrame):
     def call_profondeur(self):
         self.get_controller().call_profondeur()
 
-
     def on_mouse_wheel(self, event):
         # Défiler horizontalement en fonction de l'événement de la molette
         if event.delta:  # Pour Windows
@@ -83,4 +88,3 @@ class TopNavbar(ctk.CTkFrame):
 
     def call_largeur(self):
         self.get_controller().call_largeur()
-
