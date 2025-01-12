@@ -450,7 +450,7 @@ class MainController:
 
     def clear_canvas(self):
         self.reset_hexagon_colors()
-        self.clear_arrows()
+        self.clear_results()
         self.reactivate_all_nodes()
         self.depart_hex = None
         self.objectif_hex = None
@@ -468,7 +468,14 @@ class MainController:
         for result in self.results:
             self.main_view.main_frame.hex_canvas.delete(result)
         self.results.clear()
+
+        # Réinitialiser les dictionnaires de flèches et de cercles
+        self.arrow_ids.clear()
+        self.circle_ids.clear()
+
+        # Réinitialiser les variables de suivi des chemins
         self.path_drawn = False
+
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
@@ -731,6 +738,7 @@ class MainController:
                                 center_x - 5, center_y - 5, center_x + 5, center_y + 5, fill="grey"
                             )
                             self.circle_ids[coords] = circle_id
+                            self.results.append(circle_id)  # Ajouter le cercle à la liste des résultats
 
                             # Ajouter un délai pour voir le chemin se dessiner progressivement
                             self.main_view.after(2)  # Définir le délai en millisecondes
@@ -766,8 +774,10 @@ class MainController:
                             center1_x, center1_y, center2_x, center2_y, fill="purple", arrow=ctk.LAST, width=5
                         )
                         self.arrow_ids[(coords1, coords2)] = arrow_id
+                        self.results.append(arrow_id)  # Ajouter la flèche à la liste des résultats
                         print(f"Flèche ajoutée entre {coords1} et {coords2}")
 
                         # Ajouter un délai pour voir le chemin se dessiner progressivement
                         self.main_view.after(2)  # Définir le délai en millisecondes
                         self.main_view.update()
+
