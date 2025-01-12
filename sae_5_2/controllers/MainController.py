@@ -58,6 +58,8 @@ class MainController:
         self.current_hex_colors = {}
         self.hex_id_get_coords = {}
         self.incoming_arrows = {}
+        # Liste pour stocker les résultats (bouton effacer resultats)
+        self.results = []
 
     def generate_grid(self, rows, cols):
         return Grid(rows, cols)
@@ -368,8 +370,10 @@ class MainController:
                                                                                         arrow=ctk.LAST, width=5)
                             self.arrow_ids[(coords1, coords2)] = arrow_id
 
+                            # Ajouter la flèche à la liste des résultats
+                            self.results.append(arrow_id)
+
                             # Ajouter un délai pour voir le chemin se dessiner progressivement
-                            # TODO : modif de delai
                             self.main_view.after(5)  # Définir le délai en millisecondes
                             self.main_view.update()
 
@@ -457,7 +461,10 @@ class MainController:
                 node.valeur = 1
 
     def clear_results(self):
-        self.clear_arrows()
+        # Effacer tous les résultats stockés dans la liste
+        for result in self.results:
+            self.main_view.main_frame.hex_canvas.delete(result)
+        self.results.clear()
         self.path_drawn = False
 
     def reset_hexagon_colors(self):
@@ -465,10 +472,6 @@ class MainController:
             # TODO : veirifer
             self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
 
-    def clear_arrows(self):
-        for arrow_id in self.arrow_ids.values():
-            self.main_view.main_frame.hex_canvas.delete(arrow_id)
-        self.arrow_ids.clear()
 
     def clear_hexagons(self):
         self.main_view.main_frame.hex_canvas.delete("all")
@@ -749,6 +752,9 @@ class MainController:
 
 
     def call_stableMax(self):
+        if self.path_drawn:
+            self.clear_results()
+        
         self.stableMax.set_grid(self.grid)
         stableMax = self.stableMax.run_stableMax()
         for noeud in stableMax:
