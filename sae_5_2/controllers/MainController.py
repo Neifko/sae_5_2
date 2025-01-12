@@ -59,6 +59,7 @@ class MainController:
         self.hex_id_get_coords = {}
         self.incoming_arrows = {}
 
+        self.arrow_ids = {}
         self.circle_ids = {}
 
     def generate_grid(self, rows, cols):
@@ -282,7 +283,7 @@ class MainController:
         total_path = [total_path]
 
         # Dessiner les chemins
-        self.draw_path(path_to_target, total_path)
+        self.draw_path_with_circles(path_to_target, total_path)
 
 
     def random_case_colors(self):
@@ -466,6 +467,11 @@ class MainController:
         for arrow_id in self.arrow_ids.values():
             self.main_view.main_frame.hex_canvas.delete(arrow_id)
         self.arrow_ids.clear()
+
+        # Clear circles
+        for circle_id in self.circle_ids.values():
+            self.main_view.main_frame.hex_canvas.delete(circle_id)
+        self.circle_ids.clear()
 
     def clear_hexagons(self):
         self.main_view.main_frame.hex_canvas.delete("all")
@@ -702,21 +708,41 @@ class MainController:
                             self.circle_ids[coords] = circle_id
 
                             # Ajouter un délai pour voir le chemin se dessiner progressivement
-                            self.main_view.after(5)  # Définir le délai en millisecondes
+                            self.main_view.after(2)  # Définir le délai en millisecondes
                             self.main_view.update()
 
                         # Ajouter le nœud à l'ensemble des nœuds visités
                         visited_nodes.add(coords)
 
-        # Modifier la couleur des cercles existants en violet pour le chemin vers la cible
+        # Dessiner des flèches violettes pour le chemin vers la cible
         if path_to_target:
-            for coords in path_to_target:
-                # Vérifier que les coordonnées existent dans le dictionnaire
-                if coords in self.circle_ids:
-                    circle_id = self.circle_ids[coords]
-                    # Modifier la couleur du cercle en violet
-                    self.main_view.main_frame.hex_canvas.itemconfig(circle_id, fill="purple")
+            for i in range(len(path_to_target) - 1):
+                coords1 = path_to_target[i]
+                coords2 = path_to_target[i + 1]
 
-                    # Ajouter un délai pour voir le chemin se dessiner progressivement
-                    self.main_view.after(2)  # Définir le délai en millisecondes
-                    self.main_view.update()
+                # Vérifier que les coordonnées existent dans le dictionnaire
+                if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                    hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                    hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+
+                    # Obtenir les sommets des hexagones
+                    points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
+                    points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
+
+                    if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                        # Calculer les centres des hexagones
+                        center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                        center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                        center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                        center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+
+                        # Dessiner une flèche violette entre les deux centres
+                        arrow_id = self.main_view.main_frame.hex_canvas.create_line(
+                            center1_x, center1_y, center2_x, center2_y, fill="purple", arrow=ctk.LAST, width=5
+                        )
+                        self.arrow_ids[(coords1, coords2)] = arrow_id
+                        print(f"Flèche ajoutée entre {coords1} et {coords2}")
+
+                        # Ajouter un délai pour voir le chemin se dessiner progressivement
+                        self.main_view.after(2)  # Définir le délai en millisecondes
+                        self.main_view.update()
