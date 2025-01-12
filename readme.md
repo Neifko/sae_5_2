@@ -29,7 +29,7 @@ Voici la composition du logiciel (cliquez) :
 
 * [controllers](./sae_5_2/controllers/) : Contient les fichiers relatifs aux Contrôleurs. Encore une fois, ce répertoire est composé d'un contrôleur principal [MainController.py](./sae_5_2/controllers/MainController.py) qui appelle les contrôleurs des différents parcours.
 
-Également, vous retrouverez le sujet de la SAE [ici](./documents/topic.md), la vidéo explicative [ici](./documents/hexagones2.mp4). Vous trouverez aussi un document qui explique brièvement les algorithmes implémentés [ici](./readme.md).
+Également, vous retrouverez le sujet de la SAE [ici](./documents/topic.md) ainsi que la vidéo explicative [ici](./documents/hexagones2.mp4).
 
 
 ### 3) Procédure  
