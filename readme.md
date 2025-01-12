@@ -44,7 +44,6 @@ Afin d'exécuter le logiciel, il faut avoir les librairies suivantes installées
 
 * **Tkinter :** Bibliothèque standard de Python pour créer des interfaces graphiques.
 * **Ctkinter :** Extension de Tkinter pour des widgets plus avancés.
-* **heapq :** Module pour manipuler des tas (heaps) en Python.
 
 Si ce n'est pas le cas, vous pouvez créer un environnement virtuel Python et l'activer de la manière suivante (il faut ouvrir un terminal) :
 
@@ -67,7 +66,7 @@ Si les étapes ont bien été suivies, le prompt devrait ressembler à cela :
 Finalement, il faut exécuter la commande ci-dessous avec le fichier [requirements.yml](./config/requirements.yml) qui contient les dépendances listées un peu plus haut (il faut se déplacer dans le répertoire du fichier).
 
 ```shell
-pip install -r requirements.yml
+pip install -r requirements.txt
 ```
 
 ### 4) Utilisation
