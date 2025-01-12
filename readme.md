@@ -20,7 +20,7 @@ Le but de ce logiciel est de fournir un outil pédagogique permettant de mieux c
 
 
 ### 2) Description  
-Le logiciel a été conçu en utilisant une architecture MVC (Modèle-Vue-Controlleur). Cette architecture permet de séparer les différentes responsabilités du logiciel en trois composants principaux : le Modèle, qui la logique des graphes et des algortihmes ; la Vue, qui est responsable de l'affichage des données obtenues par le modèle à l'utilisateur ; et le Contrôleur, qui fait le lien entre le Modèle et la Vue en gérant les interactions de l'utilisateur. 
+Le logiciel a été conçu et développé en utilisant une architecture MVC (Modèle-Vue-Controlleur) avec le langage **Python**. Cette architecture permet de séparer les différentes responsabilités du logiciel en trois composants principaux : le Modèle, qui la logique des graphes et des algortihmes ; la Vue, qui est responsable de l'affichage des données obtenues par le modèle à l'utilisateur ; et le Contrôleur, qui fait le lien entre le Modèle et la Vue en gérant les interactions de l'utilisateur. 
 
 Voici la composition du logiciel (cliquez):  
 * [models](./sae_5_2/models/) : Contient les fichiers relatifs aux modèles, notemment [Node.py](./sae_5_2/models/Node.py) qui permet de créer des noeuds hexagonnaux (utilisation de coordonées hexagonales), où encore [Grid.py](./sae_5_2/models/Grid.py) qui permet de créer une grille et de joindre correctement les noeuds entre eux.  
@@ -30,10 +30,42 @@ Voici la composition du logiciel (cliquez):
 * [controllers](./sae_5_2/controllers/) : Contient les fichiers relatifs aux Controlleurs. Encore une fois, ce répertoire est composé d'un controleur principal [MainController.py](./sae_5_2/controllers/MainController.py) qui appelle les controlleurs des différents parcours.
 
 
+### 3) Procédure  
 
+Il faut tout d'abord cloner le projet en utilisant la commande suivante dans le répertoire voulu, ou bien directement dans votre IDE si vous préférez : 
 
-### 3) Procédure
+```shell
+git clone https://github.com/Neifko/sae_5_2.git
+```
 
+Afin d'executer le logiciel, il faut avoir les librairies suivantes d'installées dans son interpréteur python : 
 
+* **Tkinter :** Bibliothèque standard de Python pour créer des interfaces graphiques.
+* **Ctkinter :** Extension de Tkinter pour des widgets plus avancés.
+* **heapq :** Module pour manipuler des tas (heaps) en Python.
+
+Si ce n'est pas le cas, vous pouvez créer un environnement virtuel python et l'activer de la manière suivante (il faut ouvrir un terminal) :
+
+**Sur Windows :**
+```shell
+python -m venv <nom_environnement>
+<nom_environnement>/Scripts/activate
+```
+
+**Sur Linux/MacOS :** 
+```shell
+python3 -m venv <nom_environnement>
+source <nom_environnement>/bin/activate
+```
+
+Si les étapes ont bien été suivies, le prompt devrait ressembler à cela : 
+
+![Environnement Virtuel](./documents/image_procédure.png)
+
+Finalement, il faut éxecuter la commande ci-dessous avec le fichier [requirements.yml](./config/requirements.yml) qui contient les dépendances listée un peu plus haut (il faut se déplacer dans le répertoire du fichier).
+
+```shell
+pip install -r requirements.yml
+```
 
 ### 4) Utilisation
