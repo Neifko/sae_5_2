@@ -28,10 +28,6 @@ class algoBFSController:
         """
         Exécute l'algorithme BFS pour trouver un chemin entre deux nœuds de la grille.
 
-        Params:
-            start_node (tuple): Coordonnées (x, y, z) du nœud de départ.
-            end_node (tuple): Coordonnées (x, y, z) du nœud d'arrivée.
-
         Returns:
             list: Une liste de nœuds avec le chemin obtenu par l'algorithme 
             ou une liste vide si aucun chemin n'existe.
