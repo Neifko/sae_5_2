@@ -82,5 +82,5 @@ class BF:
         Prend en paramètre les coordonnées de départ et d'arrivée.
         """
         path_to_target, total_path = self.find_shortest_path(start_coords, goal_coords)
-        return path_to_target, path_to_target
+        return path_to_target, total_path
 
