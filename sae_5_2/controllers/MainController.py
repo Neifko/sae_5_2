@@ -60,37 +60,16 @@ class MainController:
         self.current_hex_colors = {}
         self.hex_id_get_coords = {}
         self.incoming_arrows = {}
+        # Liste pour stocker les résultats (bouton effacer resultats)
+        self.results = []
+
+        self.arrow_ids = {}
+        self.circle_ids = {}
+        self.liste_stable = []
 
     def generate_grid(self, rows, cols):
         return Grid(rows, cols)
 
-    # def draw_grid(self):
-    #     self.clear_canvas()
-    #     rows = int(self.main_view.left_frame.rows_entry.get())
-    #     cols = int(self.main_view.left_frame.cols_entry.get())
-    #
-    #     # Recréer la grille avec les nouvelles dimensions
-    #     self.grid = Grid(rows, cols)
-    #     self.draw_hex_grid(rows, cols, self.hex_size)
-
-    # def draw_max_grid(self):
-    #     self.clear_canvas()
-    #     canvas_width = self.main_view.main_frame.hex_canvas.winfo_width()
-    #     canvas_height = self.main_view.main_frame.hex_canvas.winfo_height()
-    #
-    #     # Calcul du nombre maximum de colonnes et de rangées qui peuvent tenir dans la zone de dessin
-    #     cols = int(canvas_width / (1.5 * self.hex_size))
-    #     rows = int(canvas_height / (math.sqrt(3) * self.hex_size))
-    #
-    #     # Mettre à jour les champs de saisie
-    #     self.main_view.left_frame.rows_entry.delete(0, 'end')
-    #     self.main_view.left_frame.rows_entry.insert(0, str(rows))
-    #     self.main_view.left_frame.cols_entry.delete(0, 'end')
-    #     self.main_view.left_frame.cols_entry.insert(0, str(cols))
-    #
-    #     # Recréer la grille avec les nouvelles dimensions
-    #     self.grid = Grid(rows, cols)
-    #     self.draw_hex_grid(rows, cols, self.hex_size)
 
     def draw_hex_grid(self, rows, cols, size):
         font_size = max(8, int(size * 0.4))
@@ -142,17 +121,6 @@ class MainController:
         else:
             return (0, 0)
 
-    # def toggle_coords(self):
-    #     if self.grid:
-    #         self.clear_hexagons()
-    #         self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
-
-    # def update_hex_size(self, size):
-    #     self.hex_size = int(size)
-    #     if self.grid:
-    #         self.clear_hexagons()
-    #         self.draw_hex_grid(self.grid.rows, self.grid.cols, self.hex_size)
-
     def clear_grid(self):
         self.grid = Grid(0, 0)  # Réinitialiser la grille
 
@@ -188,7 +156,7 @@ class MainController:
         print(f"Chemin total parcouru : {total_path}")
         total_path = [total_path]
         # Dessiner les chemins
-        self.draw_path(path_to_target, total_path)
+        self.draw_path_with_circles(path_to_target, total_path)
 
     def call_dijkstra(self):
         if self.path_drawn:
@@ -217,7 +185,7 @@ class MainController:
             print(f"Chemin total parcouru : {lst}")
 
         # Dessiner les chemins
-        self.draw_path(path_to_target, all_path)
+        self.draw_path_with_circles(path_to_target, all_path)
 
     def call_composantes_connexes(self):
         self.composantes_connexes_controller.set_grid(self.grid)
@@ -260,7 +228,7 @@ class MainController:
         total_path = [total_path]
 
         # Dessiner les chemins
-        self.draw_path(path_to_target, total_path)
+        self.draw_path_with_circles(path_to_target, total_path)
 
 
     def call_bellmanford(self):
@@ -293,7 +261,7 @@ class MainController:
         total_path = [total_path]
 
         # Dessiner les chemins
-        self.draw_path(path_to_target, total_path)
+        self.draw_path_with_circles(path_to_target, total_path)
 
 
     def random_case_colors(self):
@@ -321,86 +289,8 @@ class MainController:
                     node_modif.active = True
                     print(f"Node ({hex_x}, {hex_y}) activé")
 
-    # TODO : reste du graphique ici
-
-    def draw_arrow(self, x1, y1, x2, y2, color="#9900CC"):
-        self.main_view.main_frame.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=ctk.LAST, width=5)
-
-    def draw_arrow2(self, x1, y1, x2, y2, color="grey"):
-        self.main_view.main_frame.hex_canvas.create_line(x1, y1, x2, y2, fill=color, arrow=ctk.LAST, width=5)
-
-    def draw_path(self, path_to_target, total_path):
-        if not total_path:
-            return
-
-        # Dictionnaire pour stocker les identifiants des flèches grises
-        self.arrow_ids = {}
-
-        self.arrows_global = list()
-        # Variable pour suivre les nœuds visités
-        visited_nodes = set()
-        if self.depart_hex:
-            depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
-            visited_nodes.add(depart_coords)
-
-        # Dessiner le chemin parcouru complet avec des flèches grises
-        for k in total_path:
-            visited_nodes = set()
-            if self.depart_hex:
-                depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
-                visited_nodes.add(depart_coords)
-            for i in range(len(k) - 1):
-                coords1 = k[i]
-                coords2 = k[i + 1]
-
-                # Vérifier que les coordonnées existent dans le dictionnaire
-                if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
-                    hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
-                    hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
-
-                    # Obtenir les sommets des hexagones
-                    points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
-                    points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
-
-                    if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
-                        # Calculer les centres des hexagones
-                        center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
-                        center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
-                        center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
-                        center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
-
-                        # Vérifier si le nœud suivant a déjà été visité
-                        if coords2 not in visited_nodes and (coords1, coords2) not in self.arrow_ids.keys():
-                            # Dessiner une flèche grise entre les deux centres
-                            arrow_id = self.main_view.main_frame.hex_canvas.create_line(center1_x, center1_y, center2_x,
-                                                                                        center2_y, fill="grey",
-                                                                                        arrow=ctk.LAST, width=5)
-                            self.arrow_ids[(coords1, coords2)] = arrow_id
-
-                            # Ajouter un délai pour voir le chemin se dessiner progressivement
-                            # TODO : modif de delai
-                            self.main_view.after(5)  # Définir le délai en millisecondes
-                            self.main_view.update()
-
-                        # Ajouter le nœud suivant à l'ensemble des nœuds visités
-                        visited_nodes.add(coords2)
-            self.arrows_global.append(self.arrow_ids)
-
-        # Modifier la couleur des flèches existantes en violet pour le chemin vers la cible
-        if path_to_target:
-            for i in range(len(path_to_target) - 1):
-                coords1 = path_to_target[i]
-                coords2 = path_to_target[i + 1]
-
-                # Vérifier que les coordonnées existent dans le dictionnaire
-                if (coords1, coords2) in self.arrow_ids:
-                    arrow_id = self.arrow_ids[(coords1, coords2)]
-                    # Modifier la couleur de la flèche en violet
-                    self.main_view.main_frame.hex_canvas.itemconfig(arrow_id, fill="purple")
-
-                    # Ajouter un délai pour voir le chemin se dessiner progressivement
-                    self.main_view.after(2)  # Définir le délai en millisecondes
-                    self.main_view.update()
+            # Mettre à jour la valeur en fonction de la couleur
+            self.update_node_value(node_modif, color)
 
     def set_depart(self):
         self.depart_mode = True
@@ -452,7 +342,7 @@ class MainController:
 
     def clear_canvas(self):
         self.reset_hexagon_colors()
-        self.clear_arrows()
+        self.clear_results()
         self.reactivate_all_nodes()
         self.depart_hex = None
         self.objectif_hex = None
@@ -463,20 +353,40 @@ class MainController:
             grid = self.grid
             for node in grid.nodes.values():
                 node.active = True
+                node.valeur = 1
 
     def clear_results(self):
-        self.clear_arrows()
+        # Effacer tous les résultats stockés dans la liste
+        for result in self.results:
+            self.main_view.main_frame.hex_canvas.delete(result)
+
+        for hex_id in self.liste_stable:
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
+            node = self.grid.get_node(*self.hex_id_get_coords[hex_id])
+            node.active = True
+            node.valeur = 1
+        self.liste_stable.clear()
+
+        self.results.clear()
+
+        # Réinitialiser les dictionnaires de flèches et de cercles
+        self.arrow_ids.clear()
+        self.circle_ids.clear()
+
+        # Réinitialiser les variables de suivi des chemins
         self.path_drawn = False
+
 
     def reset_hexagon_colors(self):
         for (hex_x, hex_y), hex_id in self.hexagons.items():
             # TODO : veirifer
             self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
 
-    def clear_arrows(self):
-        for arrow_id in self.arrow_ids.values():
-            self.main_view.main_frame.hex_canvas.delete(arrow_id)
-        self.arrow_ids.clear()
+
+        # Clear circles
+        for circle_id in self.circle_ids.values():
+            self.main_view.main_frame.hex_canvas.delete(circle_id)
+        self.circle_ids.clear()
 
     def clear_hexagons(self):
         self.main_view.main_frame.hex_canvas.delete("all")
@@ -598,7 +508,21 @@ class MainController:
                             node_modif.active = True
                             print("Pas désactivé")
 
+                        # Mettre à jour la valeur en fonction de la couleur
+                        self.update_node_value(node_modif, self.current_color)
+
                 break
+
+
+    def update_node_value(self, node, color):
+        if color == "Blue":
+            node.valeur = 5
+        elif color == "Green":
+            node.valeur = 3
+        elif color == "Yellow":
+            node.valeur = 2
+        else:
+            node.valeur = 1  # Valeur par défaut pour les autres couleurs
 
 
     def on_canvas_motion(self, event):
@@ -623,7 +547,7 @@ class MainController:
                         else:
                             node_modif.active = True
                             print("Pas désactivé")
-
+                        self.update_node_value(node_modif, self.current_color)
                     break
 
     def on_canvas_release(self, event):
@@ -662,12 +586,99 @@ class MainController:
         total_path = [total_path]
 
         # Dessiner les chemins
-        self.draw_path(path, [path])
+        self.draw_path_with_circles(path, total_path)
 
 
     def call_stableMax(self):
+        if self.path_drawn:
+            self.clear_results()
+        
         self.stableMax.set_grid(self.grid)
         stableMax = self.stableMax.run_stableMax()
         for noeud in stableMax:
             hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
             self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="orange")
+            self.liste_stable.append(hex_id)
+
+    def draw_path_with_circles(self, path_to_target, total_path):
+        if not total_path:
+            return
+
+        # Dictionnaire pour stocker les identifiants des cercles
+        self.circle_ids = {}
+
+        # Variable pour suivre les nœuds visités
+        visited_nodes = set()
+        if self.depart_hex:
+            depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+            visited_nodes.add(depart_coords)
+
+        # Dessiner le chemin parcouru complet avec des cercles gris
+        for k in total_path:
+            visited_nodes = set()
+            if self.depart_hex:
+                depart_coords = self.hex_id_get_coords[self.hexagons[self.depart_hex]]
+                visited_nodes.add(depart_coords)
+            for coords in k:
+                # Vérifier que les coordonnées existent dans le dictionnaire
+                if coords in self.hex_id_get_coords.values():
+                    hex_id = [key for key, value in self.hex_id_get_coords.items() if value == coords][0]
+
+                    # Obtenir les sommets de l'hexagone
+                    points = self.main_view.main_frame.hex_canvas.coords(hex_id)
+
+                    if len(points) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                        # Calculer le centre de l'hexagone
+                        center_x = sum(points[i] for i in range(0, len(points), 2)) / 6
+                        center_y = sum(points[i] for i in range(1, len(points), 2)) / 6
+
+                        # Vérifier si le nœud a déjà été visité
+                        if coords not in visited_nodes:
+                            # Dessiner un cercle gris au centre de l'hexagone
+                            circle_id = self.main_view.main_frame.hex_canvas.create_oval(
+                                center_x - 5, center_y - 5, center_x + 5, center_y + 5, fill="grey"
+                            )
+                            self.circle_ids[coords] = circle_id
+                            self.results.append(circle_id)  # Ajouter le cercle à la liste des résultats
+
+                            # Ajouter un délai pour voir le chemin se dessiner progressivement
+                            self.main_view.after(2)  # Définir le délai en millisecondes
+                            self.main_view.update()
+
+                        # Ajouter le nœud à l'ensemble des nœuds visités
+                        visited_nodes.add(coords)
+
+        # Dessiner des flèches violettes pour le chemin vers la cible
+        if path_to_target:
+            for i in range(len(path_to_target) - 1):
+                coords1 = path_to_target[i]
+                coords2 = path_to_target[i + 1]
+
+                # Vérifier que les coordonnées existent dans le dictionnaire
+                if coords1 in self.hex_id_get_coords.values() and coords2 in self.hex_id_get_coords.values():
+                    hex_id1 = [key for key, value in self.hex_id_get_coords.items() if value == coords1][0]
+                    hex_id2 = [key for key, value in self.hex_id_get_coords.items() if value == coords2][0]
+
+                    # Obtenir les sommets des hexagones
+                    points1 = self.main_view.main_frame.hex_canvas.coords(hex_id1)
+                    points2 = self.main_view.main_frame.hex_canvas.coords(hex_id2)
+
+                    if len(points1) >= 12 and len(points2) >= 12:  # Chaque hexagone doit avoir 6 sommets
+                        # Calculer les centres des hexagones
+                        center1_x = sum(points1[i] for i in range(0, len(points1), 2)) / 6
+                        center1_y = sum(points1[i] for i in range(1, len(points1), 2)) / 6
+                        center2_x = sum(points2[i] for i in range(0, len(points2), 2)) / 6
+                        center2_y = sum(points2[i] for i in range(1, len(points2), 2)) / 6
+
+                        # Dessiner une flèche violette entre les deux centres
+                        arrow_id = self.main_view.main_frame.hex_canvas.create_line(
+                            center1_x, center1_y, center2_x, center2_y, fill="purple", arrow=ctk.LAST, width=5
+                        )
+                        self.arrow_ids[(coords1, coords2)] = arrow_id
+                        self.results.append(arrow_id)  # Ajouter la flèche à la liste des résultats
+                        print(f"Flèche ajoutée entre {coords1} et {coords2}")
+
+                        # Ajouter un délai pour voir le chemin se dessiner progressivement
+                        self.main_view.after(2)  # Définir le délai en millisecondes
+                        self.main_view.update()
+
