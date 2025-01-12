@@ -97,3 +97,7 @@ L'interface est composée de trois parties ; le menu de gauche (**LeftNavbar**),
 * **TopNavbar :** À l'instar du sujet, ce menu permet de choisir les algorithmes à visualiser ainsi que d'effacer soit les résultats, soit tout.  
 
 * **MainFrame :** Contient l'ensemble des nœuds et permet d'afficher les déplacements et le chemin final en prenant en compte les couleurs.
+
+
+### Algoithmes implémentés
+La liste des algoithmes implémentés dasn le logiciel est la suivante : 
