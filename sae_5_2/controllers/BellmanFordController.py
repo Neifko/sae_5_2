@@ -16,4 +16,4 @@ class BellmanFordController:
     
     def execute(self, start_coords, target_coords):
         path_to_target, total_path = self.bellman_ford.parcours(start_coords, target_coords)
-        return path_to_target, path_to_target
+        return path_to_target, total_path
