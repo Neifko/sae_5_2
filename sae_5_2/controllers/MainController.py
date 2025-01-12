@@ -244,6 +244,7 @@ class MainController:
             print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
 
         print(f"Chemin total parcouru : {total_path}")
+        total_path = [total_path]
 
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
@@ -276,6 +277,7 @@ class MainController:
             print(f"Aucun chemin trouvé entre {depart_cubique} et {arrive_cubique}.")
 
         print(f"Chemin total parcouru : {total_path}")
+        total_path = [total_path]
 
         # Dessiner les chemins
         self.draw_path(path_to_target, total_path)
