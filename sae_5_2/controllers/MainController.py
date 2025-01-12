@@ -63,6 +63,7 @@ class MainController:
 
         self.arrow_ids = {}
         self.circle_ids = {}
+        self.liste_stable = []
 
     def generate_grid(self, rows, cols):
         return Grid(rows, cols)
@@ -467,6 +468,14 @@ class MainController:
         # Effacer tous les résultats stockés dans la liste
         for result in self.results:
             self.main_view.main_frame.hex_canvas.delete(result)
+
+        for hex_id in self.liste_stable:
+            self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="white")
+            node = self.grid.get_node(*self.hex_id_get_coords[hex_id])
+            node.active = True
+            node.valeur = 1
+        self.liste_stable.clear()
+
         self.results.clear()
         self.path_drawn = False
 
@@ -691,6 +700,7 @@ class MainController:
         for noeud in stableMax:
             hex_id = [key for key, value in self.hex_id_get_coords.items() if value == (noeud.x, noeud.y, noeud.z)][0]
             self.main_view.main_frame.hex_canvas.itemconfig(hex_id, fill="orange")
+            self.liste_stable.append(hex_id)
 
     def draw_path_with_circles(self, path_to_target, total_path):
         if not total_path:
