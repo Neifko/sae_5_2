@@ -38,9 +38,9 @@ class TopNavbar(ctk.CTkFrame):
                    "Bellman-Ford", "Dijkstra", "A*", "Stable maximum", "Composantes Connexes"]
         for action in actions:
             if action == "Effacer Tout":
-                button = ctk.CTkButton(self, text=action, command=self.clear_canvas)
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_canvas)
             elif action == "Effacer Résultats":
-                button = ctk.CTkButton(self, text=action, command=self.clear_results)
+                button = ctk.CTkButton(self.inner_frame, text=action, command=self.clear_results)
             elif action == "Aléatoire":
                 button = ctk.CTkButton(self.inner_frame, text=action, command=self.random_case_colors)
             elif action == "Parcours en profondeur":
