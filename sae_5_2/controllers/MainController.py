@@ -634,7 +634,7 @@ class MainController:
                         center_y = sum(points[i] for i in range(1, len(points), 2)) / 6
 
                         # Vérifier si le nœud a déjà été visité
-                        if coords not in visited_nodes:
+                        if coords not in visited_nodes and coords not in self.circle_ids.keys():
                             # Dessiner un cercle gris au centre de l'hexagone
                             circle_id = self.main_view.main_frame.hex_canvas.create_oval(
                                 center_x - 5, center_y - 5, center_x + 5, center_y + 5, fill="grey"
